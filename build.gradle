@@ -1,6 +1,6 @@
 plugins {
-    id 'com.android.library'
-    id 'org.jetbrains.kotlin.android'
+    id 'com.android.library' version '8.2.0'
+    id 'org.jetbrains.kotlin.android' version '1.9.20'
     id 'maven-publish'
 }
 
@@ -78,7 +78,7 @@ afterEvaluate {
         publications {
             release(MavenPublication) {
                 from components.release
-                groupId = 'com.github.neuralnodes'
+                groupId = 'com.github.neuralnodes-sdk'
                 artifactId = 'neuralnodes-inbox-android'
                 version = '1.0.0'
             }
