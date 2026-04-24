@@ -5,20 +5,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="12dp"
-    android:paddingVertical="4dp">
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="3dp">
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
-        android:maxWidth="280dp"
+        android:minWidth="80dp"
+        android:maxWidth="300dp"
         android:background="@drawable/message_bubble_agent"
         android:elevation="1dp"
         android:orientation="vertical"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="12dp"
-        android:paddingBottom="8dp">
+        android:paddingHorizontal="14dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="6dp">
 
         <TextView
             android:id="@+id/senderText"
@@ -26,8 +27,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-medium"
             android:textColor="#6B7280"
-            android:textSize="12sp"
-            android:letterSpacing="0.02"
+            android:textSize="11sp"
             android:visibility="gone"
             tools:text="Customer"
             tools:visibility="visible" />
@@ -37,22 +37,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:lineSpacingExtra="3dp"
+            android:lineSpacingExtra="2dp"
             android:textColor="#111827"
             android:textSize="15sp"
             android:fontFamily="sans-serif"
-            android:letterSpacing="0.01"
             tools:text="Hi, I need help with my account settings. Can you assist me?" />
 
         <TextView
             android:id="@+id/timeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="4dp"
             android:fontFamily="sans-serif"
             android:textColor="#9CA3AF"
             android:textSize="11sp"
-            android:alpha="0.9"
+            android:alpha="0.85"
             tools:text="2:28 PM" />
 
     </LinearLayout>

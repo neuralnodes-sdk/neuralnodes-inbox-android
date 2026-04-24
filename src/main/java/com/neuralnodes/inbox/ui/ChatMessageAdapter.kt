@@ -37,7 +37,8 @@ class ChatMessageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
     
     override fun getItemViewType(position: Int): Int {
-        return if (messages[position].isFromUser) VIEW_TYPE_USER else VIEW_TYPE_AGENT
+        // In Live Chat: user = customer (left/white), agent = you (right/blue)
+        return if (messages[position].isFromAgent) VIEW_TYPE_USER else VIEW_TYPE_AGENT
     }
     
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
