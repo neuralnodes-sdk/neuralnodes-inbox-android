@@ -143,7 +143,7 @@ object UICustomizer {
                 android.content.res.ColorStateList.valueOf(Color.parseColor(it)) 
             }
             
-            // Set corner radius
+            // Set corner radius based on style
             val cornerRadius = when (uiCustomization.inputFieldStyle) {
                 "rounded" -> uiCustomization.bubbleCornerRadius.toFloat()
                 "square" -> 0f

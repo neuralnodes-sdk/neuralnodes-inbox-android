@@ -86,13 +86,6 @@ class LiveChatActivity : AppCompatActivity() {
             
             // Update placeholder text
             binding.inputField.hint = com.neuralnodes.inbox.utils.UICustomizer.getCustomText(sdkConfig, "input_placeholder")
-            
-            // Apply input field styling
-            com.neuralnodes.inbox.utils.UICustomizer.applyBranding(binding.inputLayout, sdkConfig)
-            
-            // Update empty state texts
-            binding.emptyStateTitle.text = com.neuralnodes.inbox.utils.UICustomizer.getCustomText(sdkConfig, "empty_chat_title")
-            binding.emptyStateMessage.text = com.neuralnodes.inbox.utils.UICustomizer.getCustomText(sdkConfig, "empty_chat_message")
         }
         
         // Setup status filter chips

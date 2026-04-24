@@ -68,9 +68,6 @@ class ChatActivity : AppCompatActivity() {
             
             // Update placeholder text
             binding.inputField.hint = com.neuralnodes.inbox.utils.UICustomizer.getCustomText(sdkConfig, "input_placeholder")
-            
-            // Apply input field styling
-            com.neuralnodes.inbox.utils.UICustomizer.applyBranding(binding.inputLayout, sdkConfig)
         }
         
         // Setup RecyclerView
