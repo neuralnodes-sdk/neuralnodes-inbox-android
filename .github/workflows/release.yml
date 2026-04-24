@@ -1,0 +1,61 @@
+name: Auto Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'gradle.properties'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from gradle.properties
+        id: version
+        run: |
+          VERSION=$(grep "VERSION_NAME=" gradle.properties | cut -d'=' -f2)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          if git rev-parse "v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Release
+        if: steps.check_tag.outputs.exists == 'false'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          release_name: v${{ steps.version.outputs.version }}
+          body: |
+            ## NeuralNodes Inbox SDK for Android - v${{ steps.version.outputs.version }}
+            
+            ### Installation
+            
+            ```kotlin
+            dependencies {
+                implementation("com.github.neuralnodes-sdk:neuralnodes-inbox-android:v${{ steps.version.outputs.version }}")
+            }
+            ```
+            
+            ### Changes
+            
+            See commit history for details.
+          draft: false
+          prerelease: false
