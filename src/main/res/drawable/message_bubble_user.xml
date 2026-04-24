@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Premium Blue Gradient Bubble for Agent Messages -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#6366F1" />
+    <solid android:color="#3B82F6" />
     <corners 
-        android:topLeftRadius="18dp"
-        android:topRightRadius="18dp"
-        android:bottomLeftRadius="18dp"
+        android:topLeftRadius="20dp"
+        android:topRightRadius="20dp"
+        android:bottomLeftRadius="20dp"
         android:bottomRightRadius="4dp" />
-    <padding
-        android:left="14dp"
-        android:top="10dp"
-        android:right="14dp"
-        android:bottom="10dp" />
 </shape>

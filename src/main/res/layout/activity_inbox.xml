@@ -4,33 +4,39 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F9FAFB">
+    android:background="#FAFBFC">
 
+    <!-- Premium App Bar -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="0dp"
-        app:elevation="0dp">
+        android:background="@android:color/white"
+        android:elevation="4dp"
+        app:elevation="4dp">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:title="Unified Inbox"
-            app:titleTextAppearance="@style/TextAppearance.Material3.HeadlineSmall" />
+            android:layout_height="64dp"
+            android:background="@android:color/white"
+            app:title="Inbox"
+            app:titleTextColor="#1F2937"
+            app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge" />
 
+        <!-- Elegant Filter Chips -->
         <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scrollbars="none"
-            android:paddingBottom="8dp">
+            android:background="@android:color/white"
+            android:paddingTop="4dp"
+            android:paddingBottom="12dp">
 
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/chipGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="4dp"
+                android:paddingHorizontal="16dp"
                 app:singleSelection="true"
                 app:selectionRequired="true"
                 app:chipSpacingHorizontal="8dp" />
@@ -39,6 +45,7 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <!-- Pull to Refresh -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
@@ -54,93 +61,120 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp" />
+                android:paddingTop="12dp"
+                android:paddingBottom="16dp"
+                android:scrollbars="vertical" />
 
-            <!-- Beautiful Empty State -->
+            <!-- Premium Empty State -->
             <LinearLayout
                 android:id="@+id/emptyView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="32dp"
+                android:padding="48dp"
                 android:visibility="gone">
 
-                <TextView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:background="@drawable/circle_empty_state"
-                    android:gravity="center"
-                    android:text="📬"
-                    android:textSize="40sp" />
+                <!-- Icon Container -->
+                <FrameLayout
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:background="@drawable/circle_empty_state">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="✨"
+                        android:textSize="56sp" />
+
+                </FrameLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="24dp"
                     android:text="All Caught Up!"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:textColor="#111827"
+                    android:textSize="24sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.01" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="12dp"
                     android:gravity="center"
+                    android:lineSpacingExtra="4dp"
                     android:text="No conversations yet\nNew messages will appear here"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="14sp" />
+                    android:textColor="#6B7280"
+                    android:textSize="15sp"
+                    android:alpha="0.9" />
 
             </LinearLayout>
 
-            <!-- Error State -->
+            <!-- Premium Error State -->
             <LinearLayout
                 android:id="@+id/errorView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="32dp"
+                android:padding="48dp"
                 android:visibility="gone">
 
-                <TextView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:background="@drawable/circle_empty_state"
-                    android:gravity="center"
-                    android:text="⚠️"
-                    android:textSize="40sp" />
+                <!-- Icon Container -->
+                <FrameLayout
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:background="@drawable/circle_empty_state">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="⚠️"
+                        android:textSize="56sp" />
+
+                </FrameLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Oops!"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:layout_marginTop="24dp"
+                    android:text="Connection Issue"
+                    android:textColor="#111827"
+                    android:textSize="24sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.01" />
 
                 <TextView
                     android:id="@+id/errorText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="12dp"
                     android:gravity="center"
-                    android:text="Error loading conversations"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="14sp" />
+                    android:lineSpacingExtra="4dp"
+                    android:text="Unable to load conversations\nPlease check your connection"
+                    android:textColor="#6B7280"
+                    android:textSize="15sp"
+                    android:alpha="0.9" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/retryButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Retry"
-                    app:icon="@android:drawable/ic_menu_rotate" />
+                    android:layout_marginTop="24dp"
+                    android:text="Try Again"
+                    android:textColor="@android:color/white"
+                    android:paddingHorizontal="32dp"
+                    android:paddingVertical="12dp"
+                    app:cornerRadius="24dp"
+                    app:backgroundTint="#3B82F6"
+                    app:icon="@android:drawable/ic_menu_rotate"
+                    app:iconTint="@android:color/white" />
 
             </LinearLayout>
 
