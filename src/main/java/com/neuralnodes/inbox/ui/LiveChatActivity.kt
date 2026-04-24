@@ -52,6 +52,10 @@ class LiveChatActivity : AppCompatActivity() {
         clientId = intent.getStringExtra("CLIENT_ID")
             ?: throw IllegalStateException("CLIENT_ID required")
         
+        println("🚀 LiveChatActivity started")
+        println("   API Key: ${apiKey.take(10)}...")
+        println("   Client ID: $clientId")
+        
         apiClient = APIClient(apiKey)
         
         // Get PusherClient from singleton SDK instance
@@ -130,6 +134,22 @@ class LiveChatActivity : AppCompatActivity() {
             sendMessage()
         }
         
+        // Add debug refresh button (temporary)
+        binding.toolbar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                android.R.id.home -> {
+                    onSupportNavigateUp()
+                    true
+                }
+                else -> {
+                    // Manual refresh for debugging
+                    println("🔄 Manual refresh triggered")
+                    loadEscalations()
+                    true
+                }
+            }
+        }
+        
         // Enable send button only when text is entered
         binding.inputField.addTextChangedListener(object : android.text.TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -183,10 +203,27 @@ class LiveChatActivity : AppCompatActivity() {
         escalations = filtered.toMutableList()
         escalationAdapter.submitList(escalations)
         
+        println("📊 Filter results:")
+        println("   Current filter: $currentStatusFilter")
+        println("   All escalations: ${allEscalations.size}")
+        println("   Filtered escalations: ${escalations.size}")
+        
         if (escalations.isEmpty()) {
             binding.emptyStateLayout.visibility = View.VISIBLE
+            binding.escalationsRecyclerView.visibility = View.GONE
+            
+            // Update empty state text based on filter
+            val config = com.neuralnodes.inbox.NeuralNodesInbox.getInstance().getConfig()
+            config?.let { sdkConfig ->
+                binding.emptyStateTitle.text = com.neuralnodes.inbox.utils.UICustomizer.getCustomText(sdkConfig, "empty_chat_title")
+                binding.emptyStateMessage.text = com.neuralnodes.inbox.utils.UICustomizer.getCustomText(sdkConfig, "empty_chat_message")
+            }
+            
+            println("📭 Showing empty state")
         } else {
             binding.emptyStateLayout.visibility = View.GONE
+            binding.escalationsRecyclerView.visibility = View.VISIBLE
+            println("📋 Showing ${escalations.size} escalations")
         }
     }
     
@@ -195,10 +232,17 @@ class LiveChatActivity : AppCompatActivity() {
         
         lifecycleScope.launch {
             try {
+                println("🔄 Loading escalations for client: $clientId")
                 val loadedEscalations = apiClient.getEscalations(limit = 50)
+                println("📊 Received ${loadedEscalations.size} escalations")
+                
                 allEscalations = loadedEscalations.toMutableList()
                 filterEscalations() // Apply current filter
+                
+                println("✅ Escalations loaded successfully")
             } catch (e: Exception) {
+                println("❌ Failed to load escalations: ${e.message}")
+                e.printStackTrace()
                 showError("Failed to load escalations: ${e.message}")
             } finally {
                 binding.escalationsProgressBar.visibility = View.GONE
@@ -252,19 +296,22 @@ class LiveChatActivity : AppCompatActivity() {
     private fun subscribeToClientDashboard() {
         dashboardSubscriptionJob = lifecycleScope.launch {
             try {
+                println("🔔 Subscribing to client dashboard: $clientId")
                 pusherClient.subscribeToClientDashboard(
                     clientId!!,
                     onNewEscalation = { data ->
+                        println("📨 New escalation received: $data")
                         runOnUiThread {
-                            // Refresh escalations list
+                            // Refresh escalations list immediately
                             loadEscalations()
                         }
                     }
                 ).collect { event ->
-                    println("Dashboard event: $event")
+                    println("📡 Dashboard event: $event")
                 }
             } catch (e: Exception) {
-                println("Failed to subscribe to dashboard: ${e.message}")
+                println("❌ Failed to subscribe to dashboard: ${e.message}")
+                e.printStackTrace()
             }
         }
     }
@@ -511,10 +558,14 @@ class LiveChatActivity : AppCompatActivity() {
     }
     
     private fun showError(message: String) {
+        println("❌ Error: $message")
         androidx.appcompat.app.AlertDialog.Builder(this)
             .setTitle("Error")
             .setMessage(message)
             .setPositiveButton("OK", null)
+            .setNeutralButton("Retry") { _, _ -> 
+                loadEscalations()
+            }
             .show()
     }
     

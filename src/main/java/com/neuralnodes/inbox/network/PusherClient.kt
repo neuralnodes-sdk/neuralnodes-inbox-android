@@ -39,8 +39,17 @@ class PusherClient(
         
         this.clientId = clientId
         
+        println("🔧 Initializing Pusher with:")
+        println("   Key: ${pusherKey.take(10)}...")
+        println("   Cluster: $pusherCluster")
+        println("   Client ID: $clientId")
+        println("   Auth URL: $apiBaseUrl/pusher/auth")
+        
         val authorizer = HttpAuthorizer("$apiBaseUrl/pusher/auth").apply {
-            setHeaders(mapOf("X-API-Key" to apiKey))
+            setHeaders(mapOf(
+                "X-API-Key" to apiKey,
+                "Content-Type" to "application/x-www-form-urlencoded"
+            ))
         }
         
         val options = PusherOptions().apply {
@@ -53,11 +62,17 @@ class PusherClient(
             connection.bind(ConnectionState.ALL, object : ConnectionEventListener {
                 override fun onConnectionStateChange(change: ConnectionStateChange) {
                     isConnected = change.currentState == ConnectionState.CONNECTED
-                    println("Pusher connection state: ${change.currentState}")
+                    println("🔗 Pusher connection state: ${change.currentState}")
+                    
+                    if (change.currentState == ConnectionState.CONNECTED) {
+                        println("✅ Pusher connected successfully")
+                    } else if (change.currentState == ConnectionState.DISCONNECTED) {
+                        println("❌ Pusher disconnected")
+                    }
                 }
                 
                 override fun onError(message: String?, code: String?, e: Exception?) {
-                    println("Pusher error: $message (code: $code)")
+                    println("❌ Pusher error: $message (code: $code)")
                     e?.printStackTrace()
                 }
             })

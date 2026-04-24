@@ -93,22 +93,37 @@ class APIClient(private val apiKey: String, baseURL: String = "https://api.neura
         status: String? = null,
         limit: Int = 50,
         offset: Int = 0
-    ): List<Escalation> = api.getEscalations(status, limit, offset).escalations
+    ): List<Escalation> {
+        println("🔍 Loading escalations with status: $status, limit: $limit")
+        val response = api.getEscalations(status, limit, offset)
+        println("📊 Loaded ${response.escalations.size} escalations")
+        return response.escalations
+    }
     
     // Escalation Messages
     suspend fun getEscalationMessages(
         escalationId: String,
         limit: Int = 100,
         offset: Int = 0
-    ): List<ChatMessage> = api.getEscalationMessages(escalationId, limit, offset).messages
+    ): List<ChatMessage> {
+        println("📨 Loading messages for escalation: $escalationId")
+        val response = api.getEscalationMessages(escalationId, limit, offset)
+        println("📊 Loaded ${response.messages.size} messages")
+        return response.messages
+    }
     
     suspend fun sendClientMessage(
         escalationId: String,
         messageText: String
-    ): ChatMessage = api.sendClientMessage(
-        escalationId,
-        SendChatMessageRequest(messageText)
-    ).message
+    ): ChatMessage {
+        println("📤 Sending message to escalation: $escalationId")
+        val response = api.sendClientMessage(
+            escalationId,
+            SendChatMessageRequest(messageText)
+        )
+        println("✅ Message sent: ${response.message.id}")
+        return response.message
+    }
     
     suspend fun markEscalationMessagesRead(escalationId: String) {
         api.markEscalationMessagesRead(escalationId)
