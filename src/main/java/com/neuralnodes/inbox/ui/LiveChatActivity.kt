@@ -336,10 +336,14 @@ class LiveChatActivity : AppCompatActivity() {
         
         messages.add(optimisticMessage)
         messages.sortBy { it.createdAt }
-        messageAdapter.submitList(messages.toList()) // Create new list to trigger update
+        
+        // Force adapter update by creating new list and notifying
+        val newList = messages.toList()
+        messageAdapter.submitList(newList)
+        messageAdapter.notifyItemInserted(newList.size - 1)
         scrollToBottom()
         
-        println("📤 Optimistic message added: ${optimisticMessage.id}")
+        println("📤 Optimistic message added: ${optimisticMessage.id}, total messages: ${newList.size}")
         
         lifecycleScope.launch {
             try {
@@ -351,14 +355,21 @@ class LiveChatActivity : AppCompatActivity() {
                 if (index != -1) {
                     messages[index] = serverMessage
                     messages.sortBy { it.createdAt }
-                    messageAdapter.submitList(messages.toList())
+                    
+                    // Force update with new list instance
+                    val newList = messages.toList()
+                    messageAdapter.submitList(newList)
+                    messageAdapter.notifyItemChanged(index)
                     println("🔄 Replaced optimistic message with server message: ${serverMessage.id}")
                 } else {
                     // If not found, just add it (shouldn't happen)
                     if (!messages.any { it.id == serverMessage.id }) {
                         messages.add(serverMessage)
                         messages.sortBy { it.createdAt }
-                        messageAdapter.submitList(messages.toList())
+                        
+                        val newList = messages.toList()
+                        messageAdapter.submitList(newList)
+                        messageAdapter.notifyItemInserted(newList.size - 1)
                         scrollToBottom()
                         println("➕ Added server message: ${serverMessage.id}")
                     }
@@ -369,7 +380,10 @@ class LiveChatActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 // ROLLBACK: Remove optimistic message on error
                 messages.removeAll { it.id == optimisticMessage.id }
-                messageAdapter.submitList(messages.toList())
+                
+                val newList = messages.toList()
+                messageAdapter.submitList(newList)
+                messageAdapter.notifyDataSetChanged()
                 
                 // Restore text to input field
                 binding.inputField.setText(text)
