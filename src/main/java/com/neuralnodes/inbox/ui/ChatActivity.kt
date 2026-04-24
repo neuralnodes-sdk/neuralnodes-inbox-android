@@ -205,8 +205,8 @@ class ChatActivity : AppCompatActivity() {
             senderId = null,
             attachmentUrl = null,
             attachmentType = null,
+            attachmentName = null,
             isRead = true,
-            readAt = null,
             createdAt = java.util.Date()
         )
         
