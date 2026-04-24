@@ -57,6 +57,22 @@ class ChatActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = conversationName
         
+        // Apply UI customizations from SDK config
+        val sdk = com.neuralnodes.inbox.NeuralNodesInbox.getInstance()
+        val config = sdk.getConfig()
+        
+        config?.let { sdkConfig ->
+            // Apply branding and UI customizations
+            com.neuralnodes.inbox.utils.UICustomizer.applyBranding(binding.toolbar, sdkConfig)
+            com.neuralnodes.inbox.utils.UICustomizer.applySpacing(binding.root, sdkConfig)
+            
+            // Update placeholder text
+            binding.inputField.hint = com.neuralnodes.inbox.utils.UICustomizer.getCustomText(sdkConfig, "input_placeholder")
+            
+            // Apply input field styling
+            com.neuralnodes.inbox.utils.UICustomizer.applyBranding(binding.inputLayout, sdkConfig)
+        }
+        
         // Setup RecyclerView
         adapter = MessageAdapter()
         layoutManager = LinearLayoutManager(this).apply {
@@ -85,6 +101,12 @@ class ChatActivity : AppCompatActivity() {
         // Setup send button
         binding.sendButton.setOnClickListener {
             sendMessage()
+        }
+        
+        // Apply send button customization
+        config?.let { sdkConfig ->
+            binding.sendButton.text = com.neuralnodes.inbox.utils.UICustomizer.getCustomText(sdkConfig, "send_button")
+            com.neuralnodes.inbox.utils.UICustomizer.applyBranding(binding.sendButton, sdkConfig)
         }
         
         // Enable send button only when text is entered

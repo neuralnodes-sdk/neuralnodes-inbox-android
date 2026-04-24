@@ -75,6 +75,26 @@ class LiveChatActivity : AppCompatActivity() {
         supportActionBar?.title = "Live Chat"
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         
+        // Apply UI customizations from SDK config
+        val sdk = com.neuralnodes.inbox.NeuralNodesInbox.getInstance()
+        val config = sdk.getConfig()
+        
+        config?.let { sdkConfig ->
+            // Apply branding and UI customizations
+            com.neuralnodes.inbox.utils.UICustomizer.applyBranding(binding.toolbar, sdkConfig)
+            com.neuralnodes.inbox.utils.UICustomizer.applySpacing(binding.root, sdkConfig)
+            
+            // Update placeholder text
+            binding.inputField.hint = com.neuralnodes.inbox.utils.UICustomizer.getCustomText(sdkConfig, "input_placeholder")
+            
+            // Apply input field styling
+            com.neuralnodes.inbox.utils.UICustomizer.applyBranding(binding.inputLayout, sdkConfig)
+            
+            // Update empty state texts
+            binding.emptyStateTitle.text = com.neuralnodes.inbox.utils.UICustomizer.getCustomText(sdkConfig, "empty_chat_title")
+            binding.emptyStateMessage.text = com.neuralnodes.inbox.utils.UICustomizer.getCustomText(sdkConfig, "empty_chat_message")
+        }
+        
         // Setup status filter chips
         setupStatusFilters()
         
@@ -99,6 +119,12 @@ class LiveChatActivity : AppCompatActivity() {
         // Setup send button
         binding.sendButton.setOnClickListener {
             sendMessage()
+        }
+        
+        // Apply send button customization
+        config?.let { sdkConfig ->
+            binding.sendButton.text = com.neuralnodes.inbox.utils.UICustomizer.getCustomText(sdkConfig, "send_button")
+            com.neuralnodes.inbox.utils.UICustomizer.applyBranding(binding.sendButton, sdkConfig)
         }
         
         // Enable send button only when text is entered
