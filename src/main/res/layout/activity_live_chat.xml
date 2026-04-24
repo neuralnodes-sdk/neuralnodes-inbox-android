@@ -115,9 +115,11 @@
                 android:id="@+id/messagesRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="60dp"
+                android:layout_marginBottom="80dp"
                 android:clipToPadding="false"
-                android:padding="8dp"
+                android:paddingTop="8dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
                 android:paddingBottom="24dp" />
 
             <ProgressBar
@@ -160,7 +162,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:hint="Type a message..."
                         app:boxBackgroundMode="filled"
                         app:boxBackgroundColor="#F3F4F6"
                         app:boxCornerRadiusTopStart="24dp"
@@ -168,12 +169,14 @@
                         app:boxCornerRadiusBottomStart="24dp"
                         app:boxCornerRadiusBottomEnd="24dp"
                         app:boxStrokeWidth="0dp"
-                        app:boxStrokeWidthFocused="0dp">
+                        app:boxStrokeWidthFocused="0dp"
+                        app:hintEnabled="false">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/inputField"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:hint="Type a message..."
                             android:imeOptions="actionSend"
                             android:inputType="textCapSentences|textMultiLine"
                             android:maxLines="4"
