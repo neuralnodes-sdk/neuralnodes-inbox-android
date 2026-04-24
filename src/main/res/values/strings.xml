@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NeuralNodes Inbox</string>
+    <string name="inbox_title">Inbox</string>
+    <string name="chat_title">Chat</string>
+    <string name="send">Send</string>
+    <string name="type_message">Type a message...</string>
+    <string name="no_conversations">No conversations</string>
+    <string name="error_loading">Error loading conversations</string>
+    <string name="resolve">Resolve</string>
+</resources>
