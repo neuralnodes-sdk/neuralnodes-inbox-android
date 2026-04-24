@@ -190,22 +190,83 @@ class ChatActivity : AppCompatActivity() {
         val text = binding.inputField.text.toString().trim()
         if (text.isEmpty()) return
         
+        // Clear input immediately for better UX
         binding.inputField.text?.clear()
         binding.sendButton.isEnabled = false
-        binding.inputField.isEnabled = false
+        
+        // OPTIMISTIC UPDATE: Add message immediately with temporary ID
+        val optimisticMessage = Message(
+            id = "temp_${System.currentTimeMillis()}",
+            conversationId = conversationId,
+            messageType = "text",
+            messageText = text,
+            senderType = "agent",
+            senderName = "You",
+            senderId = null,
+            attachmentUrl = null,
+            attachmentType = null,
+            isRead = true,
+            readAt = null,
+            createdAt = java.util.Date()
+        )
+        
+        messages.add(optimisticMessage)
+        
+        // Force adapter update by creating new list and notifying
+        val newList = messages.toList()
+        adapter.submitList(newList)
+        adapter.notifyItemInserted(newList.size - 1)
+        scrollToBottom()
+        
+        println("📤 Optimistic message added: ${optimisticMessage.id}, total messages: ${newList.size}")
         
         lifecycleScope.launch {
             try {
-                val message = apiClient.sendMessage(conversationId, text)
-                messages.add(message)
-                adapter.submitList(messages.toList())
-                scrollToBottom()
+                // Send message to server
+                val serverMessage = apiClient.sendMessage(conversationId, text)
+                
+                // Replace optimistic message with server response
+                val index = messages.indexOfFirst { it.id == optimisticMessage.id }
+                if (index != -1) {
+                    messages[index] = serverMessage
+                    
+                    // Force update with new list instance
+                    val updatedList = messages.toList()
+                    adapter.submitList(updatedList)
+                    adapter.notifyItemChanged(index)
+                    println("🔄 Replaced optimistic message with server message: ${serverMessage.id}")
+                } else {
+                    // If not found, just add it (shouldn't happen)
+                    if (!messages.any { it.id == serverMessage.id }) {
+                        messages.add(serverMessage)
+                        
+                        val updatedList = messages.toList()
+                        adapter.submitList(updatedList)
+                        adapter.notifyItemInserted(updatedList.size - 1)
+                        scrollToBottom()
+                        println("➕ Added server message: ${serverMessage.id}")
+                    }
+                }
+                
+                println("✅ Message sent successfully: ${serverMessage.id}")
+                
             } catch (e: Exception) {
+                // ROLLBACK: Remove optimistic message on error
+                messages.removeAll { it.id == optimisticMessage.id }
+                
+                val rollbackList = messages.toList()
+                adapter.submitList(rollbackList)
+                adapter.notifyDataSetChanged()
+                
+                // Restore text to input field
                 binding.inputField.setText(text)
                 showError(e.message ?: "Failed to send message")
+                
+                println("❌ Failed to send message: ${e.message}")
             } finally {
                 binding.inputField.isEnabled = true
-                binding.sendButton.isEnabled = true
+                // Re-enable send button if there's text
+                binding.sendButton.isEnabled = binding.inputField.text?.isNotEmpty() == true
             }
         }
     }
