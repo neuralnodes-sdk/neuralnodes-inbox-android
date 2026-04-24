@@ -88,8 +88,14 @@ class NeuralNodesInbox private constructor(private val apiKey: String) {
                 println("⚠️ Pusher not configured: pusherKey=${sdkConfig.pusherKey != null}, pusherCluster=${sdkConfig.pusherCluster != null}, clientId=$clientId")
             }
             
+            println("✅ SDK initialized successfully")
+            println("📋 Features: ${sdkConfig.features}")
+            println("🎨 UI Customization: ${sdkConfig.uiCustomization}")
+            println("⚙️ Limits: ${sdkConfig.limits}")
+            
             Result.success(sdkConfig)
         } catch (e: Exception) {
+            println("❌ SDK initialization failed: ${e.message}")
             Result.failure(e)
         }
     }
@@ -163,6 +169,11 @@ class NeuralNodesInbox private constructor(private val apiKey: String) {
      * Get Ably real-time client for custom implementations
      */
     fun getRealtimeClient(): RealtimeClient = realtimeClient
+    
+    /**
+     * Get current SDK configuration
+     */
+    fun getConfig(): SDKConfig? = config
     
     /**
      * Get Pusher client for custom implementations
