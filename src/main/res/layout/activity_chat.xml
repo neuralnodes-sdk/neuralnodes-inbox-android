@@ -66,8 +66,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="12dp"
+                android:padding="16dp"
                 android:gravity="center_vertical"
+                android:minHeight="72dp"
                 android:background="@android:color/white">
 
                 <!-- Modern Input Field -->
@@ -106,18 +107,21 @@
                 <!-- Premium Send Button -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/sendButton"
-                    android:layout_width="52dp"
-                    android:layout_height="52dp"
-                    android:layout_marginStart="10dp"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_marginStart="8dp"
                     android:enabled="false"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
-                    android:text="→"
-                    android:textSize="24sp"
+                    android:insetLeft="0dp"
+                    android:insetRight="0dp"
+                    android:text="➤"
+                    android:textSize="20sp"
                     android:textColor="@android:color/white"
-                    app:cornerRadius="26dp"
+                    app:cornerRadius="28dp"
                     app:backgroundTint="#3B82F6"
-                    app:elevation="2dp" />
+                    app:elevation="2dp"
+                    app:iconPadding="0dp" />
 
             </LinearLayout>
 
