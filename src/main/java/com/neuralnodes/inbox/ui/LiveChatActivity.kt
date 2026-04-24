@@ -211,14 +211,6 @@ class LiveChatActivity : AppCompatActivity() {
         if (escalations.isEmpty()) {
             binding.emptyStateLayout.visibility = View.VISIBLE
             binding.escalationsRecyclerView.visibility = View.GONE
-            
-            // Update empty state text based on filter
-            val config = com.neuralnodes.inbox.NeuralNodesInbox.getInstance().getConfig()
-            config?.let { sdkConfig ->
-                binding.emptyStateTitle.text = com.neuralnodes.inbox.utils.UICustomizer.getCustomText(sdkConfig, "empty_chat_title")
-                binding.emptyStateMessage.text = com.neuralnodes.inbox.utils.UICustomizer.getCustomText(sdkConfig, "empty_chat_message")
-            }
-            
             println("📭 Showing empty state")
         } else {
             binding.emptyStateLayout.visibility = View.GONE
