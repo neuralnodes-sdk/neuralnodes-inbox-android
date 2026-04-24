@@ -57,17 +57,23 @@ class ChatActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = conversationName
         
-        // Apply UI customizations from SDK config
+        // Apply COMPLETE UI customizations from SDK config
         val sdk = com.neuralnodes.inbox.NeuralNodesInbox.getInstance()
         val config = sdk.getConfig()
         
         config?.let { sdkConfig ->
-            // Apply branding and UI customizations
+            // Apply complete activity configuration
+            com.neuralnodes.inbox.utils.UICustomizer.applyActivityConfiguration(binding.root, sdkConfig)
+            
+            // Apply toolbar styling
             com.neuralnodes.inbox.utils.UICustomizer.applyBranding(binding.toolbar, sdkConfig)
-            com.neuralnodes.inbox.utils.UICustomizer.applySpacing(binding.root, sdkConfig)
             
             // Update placeholder text
             binding.inputField.hint = com.neuralnodes.inbox.utils.UICustomizer.getCustomText(sdkConfig, "input_placeholder")
+            
+            // Apply send button customization
+            binding.sendButton.text = com.neuralnodes.inbox.utils.UICustomizer.getCustomText(sdkConfig, "send_button")
+            com.neuralnodes.inbox.utils.UICustomizer.applyBranding(binding.sendButton, sdkConfig)
         }
         
         // Setup RecyclerView
@@ -80,6 +86,11 @@ class ChatActivity : AppCompatActivity() {
         binding.recyclerView.apply {
             layoutManager = this@ChatActivity.layoutManager
             adapter = this@ChatActivity.adapter
+            
+            // Apply RecyclerView styling
+            config?.let { sdkConfig ->
+                com.neuralnodes.inbox.utils.UICustomizer.applyBranding(this, sdkConfig)
+            }
             
             // Add scroll listener for pagination
             addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
@@ -98,12 +109,6 @@ class ChatActivity : AppCompatActivity() {
         // Setup send button
         binding.sendButton.setOnClickListener {
             sendMessage()
-        }
-        
-        // Apply send button customization
-        config?.let { sdkConfig ->
-            binding.sendButton.text = com.neuralnodes.inbox.utils.UICustomizer.getCustomText(sdkConfig, "send_button")
-            com.neuralnodes.inbox.utils.UICustomizer.applyBranding(binding.sendButton, sdkConfig)
         }
         
         // Enable send button only when text is entered

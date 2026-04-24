@@ -75,17 +75,23 @@ class LiveChatActivity : AppCompatActivity() {
         supportActionBar?.title = "Live Chat"
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         
-        // Apply UI customizations from SDK config
+        // Apply COMPLETE UI customizations from SDK config
         val sdk = com.neuralnodes.inbox.NeuralNodesInbox.getInstance()
         val config = sdk.getConfig()
         
         config?.let { sdkConfig ->
-            // Apply branding and UI customizations
+            // Apply complete activity configuration
+            com.neuralnodes.inbox.utils.UICustomizer.applyActivityConfiguration(binding.root, sdkConfig)
+            
+            // Apply toolbar styling
             com.neuralnodes.inbox.utils.UICustomizer.applyBranding(binding.toolbar, sdkConfig)
-            com.neuralnodes.inbox.utils.UICustomizer.applySpacing(binding.root, sdkConfig)
             
             // Update placeholder text
             binding.inputField.hint = com.neuralnodes.inbox.utils.UICustomizer.getCustomText(sdkConfig, "input_placeholder")
+            
+            // Apply send button customization
+            binding.sendButton.text = com.neuralnodes.inbox.utils.UICustomizer.getCustomText(sdkConfig, "send_button")
+            com.neuralnodes.inbox.utils.UICustomizer.applyBranding(binding.sendButton, sdkConfig)
         }
         
         // Setup status filter chips
@@ -98,6 +104,11 @@ class LiveChatActivity : AppCompatActivity() {
         binding.escalationsRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@LiveChatActivity)
             adapter = escalationAdapter
+            
+            // Apply RecyclerView styling
+            config?.let { sdkConfig ->
+                com.neuralnodes.inbox.utils.UICustomizer.applyBranding(this, sdkConfig)
+            }
         }
         
         // Setup messages RecyclerView
@@ -107,17 +118,16 @@ class LiveChatActivity : AppCompatActivity() {
                 stackFromEnd = true
             }
             adapter = messageAdapter
+            
+            // Apply RecyclerView styling
+            config?.let { sdkConfig ->
+                com.neuralnodes.inbox.utils.UICustomizer.applyBranding(this, sdkConfig)
+            }
         }
         
         // Setup send button
         binding.sendButton.setOnClickListener {
             sendMessage()
-        }
-        
-        // Apply send button customization
-        config?.let { sdkConfig ->
-            binding.sendButton.text = com.neuralnodes.inbox.utils.UICustomizer.getCustomText(sdkConfig, "send_button")
-            com.neuralnodes.inbox.utils.UICustomizer.applyBranding(binding.sendButton, sdkConfig)
         }
         
         // Enable send button only when text is entered
