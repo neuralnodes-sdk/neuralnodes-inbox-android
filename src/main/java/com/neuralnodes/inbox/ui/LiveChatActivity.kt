@@ -335,8 +335,11 @@ class LiveChatActivity : AppCompatActivity() {
         )
         
         messages.add(optimisticMessage)
-        messageAdapter.submitList(messages.toList())
+        messages.sortBy { it.createdAt }
+        messageAdapter.submitList(messages.toList()) // Create new list to trigger update
         scrollToBottom()
+        
+        println("📤 Optimistic message added: ${optimisticMessage.id}")
         
         lifecycleScope.launch {
             try {
@@ -347,13 +350,17 @@ class LiveChatActivity : AppCompatActivity() {
                 val index = messages.indexOfFirst { it.id == optimisticMessage.id }
                 if (index != -1) {
                     messages[index] = serverMessage
+                    messages.sortBy { it.createdAt }
                     messageAdapter.submitList(messages.toList())
+                    println("🔄 Replaced optimistic message with server message: ${serverMessage.id}")
                 } else {
                     // If not found, just add it (shouldn't happen)
                     if (!messages.any { it.id == serverMessage.id }) {
                         messages.add(serverMessage)
+                        messages.sortBy { it.createdAt }
                         messageAdapter.submitList(messages.toList())
                         scrollToBottom()
+                        println("➕ Added server message: ${serverMessage.id}")
                     }
                 }
                 
