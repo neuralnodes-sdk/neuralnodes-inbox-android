@@ -37,21 +37,23 @@ class ChatMessageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
     
     override fun getItemViewType(position: Int): Int {
-        // In Live Chat: user = customer (left/white), agent = you (right/blue)
-        return if (messages[position].isFromAgent) VIEW_TYPE_USER else VIEW_TYPE_AGENT
+        // Agent (you) = RIGHT/BLUE, Customer = LEFT/GRAY
+        return if (messages[position].isFromAgent) VIEW_TYPE_AGENT else VIEW_TYPE_USER
     }
     
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            VIEW_TYPE_USER -> {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_message_user, parent, false)
-                UserMessageViewHolder(view)
-            }
-            else -> {
+            VIEW_TYPE_AGENT -> {
+                // Agent messages on RIGHT with BLUE background
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_message_agent, parent, false)
                 AgentMessageViewHolder(view)
+            }
+            else -> {
+                // User/Customer messages on LEFT with GRAY background
+                val view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.item_message_user, parent, false)
+                UserMessageViewHolder(view)
             }
         }
     }

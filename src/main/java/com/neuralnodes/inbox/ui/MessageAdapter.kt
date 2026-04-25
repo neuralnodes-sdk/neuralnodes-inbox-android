@@ -26,27 +26,29 @@ class MessageAdapter : ListAdapter<Message, RecyclerView.ViewHolder>(MessageDiff
     }
     
     override fun getItemViewType(position: Int): Int {
-        // Swap: Agent messages on right (blue), User messages on left (gray)
-        return if (getItem(position).isFromAgent) VIEW_TYPE_USER else VIEW_TYPE_AGENT
+        // Agent (you) = RIGHT/BLUE, Customer = LEFT/GRAY
+        return if (getItem(position).isFromAgent) VIEW_TYPE_AGENT else VIEW_TYPE_USER
     }
     
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            VIEW_TYPE_USER -> {
-                val binding = ItemMessageUserBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false
-                )
-                UserMessageViewHolder(binding)
-            }
-            else -> {
+            VIEW_TYPE_AGENT -> {
+                // Agent messages on RIGHT with BLUE background
                 val binding = ItemMessageAgentBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
                 )
                 AgentMessageViewHolder(binding)
+            }
+            else -> {
+                // User/Customer messages on LEFT with GRAY background
+                val binding = ItemMessageUserBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+                UserMessageViewHolder(binding)
             }
         }
     }

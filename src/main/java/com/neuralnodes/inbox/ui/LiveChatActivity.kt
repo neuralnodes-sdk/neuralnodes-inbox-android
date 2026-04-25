@@ -262,6 +262,9 @@ class LiveChatActivity : AppCompatActivity() {
         supportActionBar?.title = escalation.displayName
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         
+        // Hide filter chips when viewing chat
+        binding.filterChipsContainer.visibility = View.GONE
+        
         // Show chat UI, hide escalations list
         binding.escalationsContainer.visibility = View.GONE
         binding.chatContainer.visibility = View.VISIBLE
@@ -286,13 +289,39 @@ class LiveChatActivity : AppCompatActivity() {
                 // Show Resolve and End Chat buttons
                 binding.resolveButton.visibility = View.VISIBLE
                 binding.endChatButton.visibility = View.VISIBLE
+                binding.actionButtonsCard.visibility = View.VISIBLE
+                
+                // Adjust RecyclerView margin to account for action buttons
+                val params = binding.messagesRecyclerView.layoutParams as android.view.ViewGroup.MarginLayoutParams
+                params.bottomMargin = dpToPx(140) // 72dp input + 68dp action buttons
+                binding.messagesRecyclerView.layoutParams = params
+                
+                // Adjust typing indicator margin
+                val typingParams = binding.typingIndicatorCard.layoutParams as android.widget.FrameLayout.LayoutParams
+                typingParams.bottomMargin = dpToPx(148)
+                binding.typingIndicatorCard.layoutParams = typingParams
             }
             else -> {
                 // Hide action buttons for resolved/closed chats
                 binding.resolveButton.visibility = View.GONE
                 binding.endChatButton.visibility = View.GONE
+                binding.actionButtonsCard.visibility = View.GONE
+                
+                // Reset RecyclerView margin to just input height
+                val params = binding.messagesRecyclerView.layoutParams as android.view.ViewGroup.MarginLayoutParams
+                params.bottomMargin = dpToPx(72) // Just input container
+                binding.messagesRecyclerView.layoutParams = params
+                
+                // Reset typing indicator margin
+                val typingParams = binding.typingIndicatorCard.layoutParams as android.widget.FrameLayout.LayoutParams
+                typingParams.bottomMargin = dpToPx(80)
+                binding.typingIndicatorCard.layoutParams = typingParams
             }
         }
+    }
+    
+    private fun dpToPx(dp: Int): Int {
+        return (dp * resources.displayMetrics.density).toInt()
     }
     
     private fun resolveEscalation() {
@@ -683,6 +712,9 @@ class LiveChatActivity : AppCompatActivity() {
         // Update toolbar
         supportActionBar?.title = "Live Chat"
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        
+        // Show filter chips when viewing list
+        binding.filterChipsContainer.visibility = View.VISIBLE
         
         // Show escalations list, hide chat
         binding.escalationsContainer.visibility = View.VISIBLE

@@ -20,17 +20,24 @@
             android:layout_width="match_parent"
             android:layout_height="64dp"
             android:background="@android:color/transparent"
+            android:contentInsetStart="0dp"
+            android:contentInsetEnd="0dp"
+            app:contentInsetStart="0dp"
+            app:contentInsetEnd="0dp"
+            app:contentInsetStartWithNavigation="0dp"
+            app:contentInsetEndWithActions="0dp"
             app:titleTextColor="#FFFFFF"
             app:navigationIconTint="#FFFFFF"
             app:titleTextAppearance="@style/TextAppearance.Title" />
 
-        <!-- Professional Filter Chips -->
+        <!-- Professional Filter Chips - Only visible in list view -->
         <HorizontalScrollView
+            android:id="@+id/filterChipsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scrollbars="none"
             android:background="@android:color/transparent"
-            android:paddingTop="8dp"
+            android:paddingTop="0dp"
             android:paddingBottom="16dp"
             android:clipToPadding="false">
 
@@ -143,12 +150,12 @@
                 android:id="@+id/messagesRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="160dp"
+                android:layout_marginBottom="72dp"
                 android:clipToPadding="false"
                 android:paddingTop="16dp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:paddingBottom="16dp"
+                android:paddingBottom="24dp"
                 android:scrollbars="none"
                 android:overScrollMode="never"
                 android:background="#FFFFFF" />
@@ -168,7 +175,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|start"
                 android:layout_marginStart="20dp"
-                android:layout_marginBottom="164dp"
+                android:layout_marginBottom="80dp"
                 android:visibility="gone"
                 app:cardBackgroundColor="#F3F4F6"
                 app:cardCornerRadius="20dp"

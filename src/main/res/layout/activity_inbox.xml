@@ -19,6 +19,12 @@
             android:layout_width="match_parent"
             android:layout_height="64dp"
             android:background="@android:color/transparent"
+            android:contentInsetStart="0dp"
+            android:contentInsetEnd="0dp"
+            app:contentInsetStart="0dp"
+            app:contentInsetEnd="0dp"
+            app:contentInsetStartWithNavigation="0dp"
+            app:contentInsetEndWithActions="0dp"
             app:title="Inbox"
             app:titleTextColor="#FFFFFF"
             app:navigationIconTint="#FFFFFF"
@@ -30,7 +36,7 @@
             android:layout_height="wrap_content"
             android:scrollbars="none"
             android:background="@android:color/transparent"
-            android:paddingTop="8dp"
+            android:paddingTop="0dp"
             android:paddingBottom="16dp"
             android:clipToPadding="false">
 
