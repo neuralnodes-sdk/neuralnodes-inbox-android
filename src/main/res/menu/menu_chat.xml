@@ -5,14 +5,16 @@
     <item
         android:id="@+id/action_resolve"
         android:title="Resolve"
-        android:icon="@android:drawable/ic_menu_close_clear_cancel"
+        android:icon="@drawable/ic_check_circle"
+        app:iconTint="#FFFFFF"
         app:showAsAction="ifRoom"
         android:visible="true" />
     
     <item
         android:id="@+id/action_close"
         android:title="Close"
-        android:icon="@android:drawable/ic_menu_close_clear_cancel"
+        android:icon="@drawable/ic_close_circle"
+        app:iconTint="#FFFFFF"
         app:showAsAction="never"
         android:visible="true" />
     
@@ -20,6 +22,7 @@
         android:id="@+id/action_unresolve"
         android:title="Unresolve"
         android:icon="@android:drawable/ic_menu_revert"
+        app:iconTint="#FFFFFF"
         app:showAsAction="never"
         android:visible="false" />
     
@@ -27,6 +30,7 @@
         android:id="@+id/action_reopen"
         android:title="Reopen"
         android:icon="@android:drawable/ic_menu_revert"
+        app:iconTint="#FFFFFF"
         app:showAsAction="never"
         android:visible="false" />
     

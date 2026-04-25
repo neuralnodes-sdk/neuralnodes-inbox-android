@@ -2,141 +2,142 @@
 <com.google.android.material.card.MaterialCardView 
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="16dp"
+    android:layout_marginHorizontal="4dp"
     android:layout_marginVertical="6dp"
-    android:clickable="true"
-    android:focusable="true"
-    android:foreground="?attr/selectableItemBackground"
-    app:cardBackgroundColor="@android:color/white"
+    app:cardBackgroundColor="#FFFFFF"
     app:cardCornerRadius="16dp"
     app:cardElevation="2dp"
-    app:strokeWidth="0dp">
+    app:strokeWidth="0dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center_vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <!-- Premium Channel Icon -->
-        <FrameLayout
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_marginEnd="16dp">
-
-            <View
-                android:id="@+id/iconBackground"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:background="@drawable/circle_avatar" />
-
-            <TextView
-                android:id="@+id/iconText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:textSize="28sp"
-                tools:text="💬" />
-
-        </FrameLayout>
-
-        <!-- Content Section -->
+        <!-- Header Row -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-            <!-- Header Row -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+            <!-- Channel Icon -->
+            <FrameLayout
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/circle_empty_state">
 
                 <TextView
-                    android:id="@+id/nameText"
-                    android:layout_width="0dp"
+                    android:id="@+id/channelIcon"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ellipsize="end"
-                    android:maxLines="1"
+                    android:layout_gravity="center"
+                    android:text="💬"
+                    android:textSize="24sp" />
+
+            </FrameLayout>
+
+            <!-- Name and Channel -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/contactName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Customer Name"
                     android:textColor="#111827"
                     android:textSize="16sp"
                     android:fontFamily="sans-serif-medium"
-                    tools:text="John Doe" />
+                    android:maxLines="1"
+                    android:ellipsize="end" />
 
                 <TextView
-                    android:id="@+id/timeText"
+                    android:id="@+id/channelText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:textColor="#9CA3AF"
-                    android:textSize="13sp"
-                    android:fontFamily="sans-serif"
-                    tools:text="2h" />
+                    android:layout_marginTop="4dp"
+                    android:text="Web Chat"
+                    android:textColor="#6B7280"
+                    android:textSize="13sp" />
 
             </LinearLayout>
 
-            <!-- Channel Badge and Unread Count -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+            <!-- Unread Badge -->
+            <FrameLayout
+                android:id="@+id/unreadBadge"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:background="@drawable/circle_empty_state"
+                android:backgroundTint="#EF4444"
+                android:visibility="gone">
 
                 <TextView
-                    android:id="@+id/channelBadge"
+                    android:id="@+id/unreadCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/status_badge_active"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="4dp"
-                    android:text="Web"
-                    android:textColor="@android:color/white"
-                    android:textSize="11sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:letterSpacing="0.02"
-                    tools:text="WhatsApp" />
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-
-                <TextView
-                    android:id="@+id/badgeText"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:background="@drawable/badge_background"
-                    android:gravity="center"
-                    android:textColor="@android:color/white"
+                    android:layout_gravity="center"
+                    android:text="5"
+                    android:textColor="#FFFFFF"
                     android:textSize="12sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:visibility="gone"
-                    tools:text="3"
-                    tools:visibility="visible" />
+                    android:fontFamily="sans-serif-medium" />
 
-            </LinearLayout>
+            </FrameLayout>
 
-            <!-- Message Preview -->
+        </LinearLayout>
+
+        <!-- Message Preview -->
+        <TextView
+            android:id="@+id/lastMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Last message preview goes here..."
+            android:textColor="#6B7280"
+            android:textSize="14sp"
+            android:lineSpacingExtra="2dp"
+            android:maxLines="2"
+            android:ellipsize="end" />
+
+        <!-- Footer Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
             <TextView
-                android:id="@+id/messageText"
-                android:layout_width="match_parent"
+                android:id="@+id/timestamp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:lineSpacingExtra="2dp"
-                android:textColor="#6B7280"
-                android:textSize="14sp"
-                android:alpha="0.95"
-                tools:text="Last message preview goes here and can span multiple lines for better readability..." />
+                android:layout_weight="1"
+                android:text="2 min ago"
+                android:textColor="#9CA3AF"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/statusBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:background="@drawable/bg_chip_selected"
+                android:text="Active"
+                android:textColor="#FFFFFF"
+                android:textSize="11sp"
+                android:fontFamily="sans-serif-medium" />
 
         </LinearLayout>
 
