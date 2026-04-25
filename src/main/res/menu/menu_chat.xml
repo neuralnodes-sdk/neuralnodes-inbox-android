@@ -5,6 +5,29 @@
     <item
         android:id="@+id/action_resolve"
         android:title="Resolve"
-        app:showAsAction="ifRoom" />
-        
+        android:icon="@android:drawable/ic_menu_close_clear_cancel"
+        app:showAsAction="ifRoom"
+        android:visible="true" />
+    
+    <item
+        android:id="@+id/action_close"
+        android:title="Close"
+        android:icon="@android:drawable/ic_menu_close_clear_cancel"
+        app:showAsAction="never"
+        android:visible="true" />
+    
+    <item
+        android:id="@+id/action_unresolve"
+        android:title="Unresolve"
+        android:icon="@android:drawable/ic_menu_revert"
+        app:showAsAction="never"
+        android:visible="false" />
+    
+    <item
+        android:id="@+id/action_reopen"
+        android:title="Reopen"
+        android:icon="@android:drawable/ic_menu_revert"
+        app:showAsAction="never"
+        android:visible="false" />
+    
 </menu>

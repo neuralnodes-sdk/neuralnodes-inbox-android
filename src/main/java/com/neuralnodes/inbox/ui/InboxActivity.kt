@@ -137,6 +137,7 @@ class InboxActivity : AppCompatActivity() {
             putExtra("API_KEY", intent.getStringExtra("API_KEY"))
             putExtra("CONVERSATION_ID", conversation.id)
             putExtra("CONVERSATION_NAME", conversation.displayName)
+            putExtra("CONVERSATION_STATUS", conversation.status)
         }
         startActivity(intent)
     }

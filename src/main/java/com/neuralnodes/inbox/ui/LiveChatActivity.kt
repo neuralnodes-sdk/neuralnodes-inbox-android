@@ -134,6 +134,15 @@ class LiveChatActivity : AppCompatActivity() {
             sendMessage()
         }
         
+        // Setup action buttons
+        binding.resolveButton.setOnClickListener {
+            resolveEscalation()
+        }
+        
+        binding.endChatButton.setOnClickListener {
+            endEscalation()
+        }
+        
         // Add debug refresh button (temporary)
         binding.toolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
@@ -258,6 +267,9 @@ class LiveChatActivity : AppCompatActivity() {
         binding.chatContainer.visibility = View.VISIBLE
         binding.inputContainer.visibility = View.VISIBLE
         
+        // Show/hide action buttons based on status
+        updateActionButtons(escalation.status.name.lowercase())
+        
         // Load messages
         loadMessages(escalation.id)
         
@@ -266,6 +278,66 @@ class LiveChatActivity : AppCompatActivity() {
         
         // Mark messages as read
         markMessagesAsRead(escalation.id)
+    }
+    
+    private fun updateActionButtons(status: String) {
+        when (status) {
+            "active", "pending" -> {
+                // Show Resolve and End Chat buttons
+                binding.resolveButton.visibility = View.VISIBLE
+                binding.endChatButton.visibility = View.VISIBLE
+            }
+            else -> {
+                // Hide action buttons for resolved/closed chats
+                binding.resolveButton.visibility = View.GONE
+                binding.endChatButton.visibility = View.GONE
+            }
+        }
+    }
+    
+    private fun resolveEscalation() {
+        if (activeEscalation == null) return
+        
+        com.neuralnodes.inbox.utils.ConfirmationDialog.showResolveConfirmation(this) {
+            lifecycleScope.launch {
+                try {
+                    apiClient.resolveEscalation(activeEscalation!!.id)
+                    showSuccess("Chat resolved")
+                    
+                    // Update local status
+                    activeEscalation = activeEscalation!!.copy(
+                        status = com.neuralnodes.inbox.models.EscalationStatus.RESOLVED
+                    )
+                    updateActionButtons("resolved")
+                    
+                    // Refresh escalations list
+                    loadEscalations()
+                } catch (e: Exception) {
+                    showError("Failed to resolve chat: ${e.message}")
+                }
+            }
+        }
+    }
+    
+    private fun endEscalation() {
+        if (activeEscalation == null) return
+        
+        com.neuralnodes.inbox.utils.ConfirmationDialog.showEndChatConfirmation(this) {
+            lifecycleScope.launch {
+                try {
+                    apiClient.endEscalation(activeEscalation!!.id)
+                    showSuccess("Chat ended")
+                    
+                    // Go back to escalations list
+                    showEscalationsList()
+                    
+                    // Refresh escalations list
+                    loadEscalations()
+                } catch (e: Exception) {
+                    showError("Failed to end chat: ${e.message}")
+                }
+            }
+        }
     }
     
     private fun loadMessages(escalationId: String) {
@@ -568,6 +640,10 @@ class LiveChatActivity : AppCompatActivity() {
             .setPositiveButton("Retry") { _, _ -> onRetry() }
             .setNegativeButton("Cancel", null)
             .show()
+    }
+    
+    private fun showSuccess(message: String) {
+        android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show()
     }
     
     override fun onDestroy() {

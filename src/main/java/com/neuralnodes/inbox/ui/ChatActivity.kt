@@ -26,6 +26,7 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var layoutManager: LinearLayoutManager
     
     private lateinit var conversationId: String
+    private var conversationStatus: String = "active"
     private var messages = mutableListOf<Message>()
     private var isLoadingMore = false
     private var hasMoreMessages = true
@@ -42,6 +43,7 @@ class ChatActivity : AppCompatActivity() {
         conversationId = intent.getStringExtra("CONVERSATION_ID") 
             ?: throw IllegalStateException("CONVERSATION_ID required")
         val conversationName = intent.getStringExtra("CONVERSATION_NAME") ?: "Chat"
+        conversationStatus = intent.getStringExtra("CONVERSATION_STATUS") ?: "active"
         
         apiClient = APIClient(apiKey)
         realtimeClient = RealtimeClient()
@@ -296,12 +298,61 @@ class ChatActivity : AppCompatActivity() {
     }
     
     private fun resolveConversation() {
-        lifecycleScope.launch {
-            try {
-                apiClient.updateStatus(conversationId, "resolved")
-                finish()
-            } catch (e: Exception) {
-                showError(e.message ?: "Failed to resolve conversation")
+        com.neuralnodes.inbox.utils.ConfirmationDialog.showResolveConfirmation(this) {
+            lifecycleScope.launch {
+                try {
+                    apiClient.updateStatus(conversationId, "resolved")
+                    conversationStatus = "resolved"
+                    invalidateOptionsMenu() // Refresh menu
+                    showSuccess("Conversation resolved")
+                } catch (e: Exception) {
+                    showError(e.message ?: "Failed to resolve conversation")
+                }
+            }
+        }
+    }
+    
+    private fun closeConversation() {
+        com.neuralnodes.inbox.utils.ConfirmationDialog.showCloseConfirmation(this) {
+            lifecycleScope.launch {
+                try {
+                    apiClient.closeConversation(conversationId)
+                    conversationStatus = "closed"
+                    invalidateOptionsMenu() // Refresh menu
+                    showSuccess("Conversation closed")
+                } catch (e: Exception) {
+                    showError(e.message ?: "Failed to close conversation")
+                }
+            }
+        }
+    }
+    
+    private fun unresolveConversation() {
+        com.neuralnodes.inbox.utils.ConfirmationDialog.showUnresolveConfirmation(this) {
+            lifecycleScope.launch {
+                try {
+                    apiClient.unresolveConversation(conversationId)
+                    conversationStatus = "active"
+                    invalidateOptionsMenu() // Refresh menu
+                    showSuccess("Conversation moved to active")
+                } catch (e: Exception) {
+                    showError(e.message ?: "Failed to unresolve conversation")
+                }
+            }
+        }
+    }
+    
+    private fun reopenConversation() {
+        com.neuralnodes.inbox.utils.ConfirmationDialog.showReopenConfirmation(this) {
+            lifecycleScope.launch {
+                try {
+                    apiClient.reopenConversation(conversationId)
+                    conversationStatus = "active"
+                    invalidateOptionsMenu() // Refresh menu
+                    showSuccess("Conversation reopened")
+                } catch (e: Exception) {
+                    showError(e.message ?: "Failed to reopen conversation")
+                }
             }
         }
     }
@@ -320,15 +371,72 @@ class ChatActivity : AppCompatActivity() {
             .show()
     }
     
+    private fun showSuccess(message: String) {
+        android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show()
+    }
+    
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_chat, menu)
         return true
+    }
+    
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        // Show/hide menu items based on conversation status
+        val resolveItem = menu.findItem(R.id.action_resolve)
+        val closeItem = menu.findItem(R.id.action_close)
+        val unresolveItem = menu.findItem(R.id.action_unresolve)
+        val reopenItem = menu.findItem(R.id.action_reopen)
+        
+        when (conversationStatus.lowercase()) {
+            "active" -> {
+                // Active: Show Resolve and Close
+                resolveItem?.isVisible = true
+                closeItem?.isVisible = true
+                unresolveItem?.isVisible = false
+                reopenItem?.isVisible = false
+            }
+            "resolved" -> {
+                // Resolved: Show Unresolve
+                resolveItem?.isVisible = false
+                closeItem?.isVisible = false
+                unresolveItem?.isVisible = true
+                reopenItem?.isVisible = false
+            }
+            "closed" -> {
+                // Closed: Show Reopen
+                resolveItem?.isVisible = false
+                closeItem?.isVisible = false
+                unresolveItem?.isVisible = false
+                reopenItem?.isVisible = true
+            }
+            else -> {
+                // Default: Show all
+                resolveItem?.isVisible = true
+                closeItem?.isVisible = true
+                unresolveItem?.isVisible = false
+                reopenItem?.isVisible = false
+            }
+        }
+        
+        return super.onPrepareOptionsMenu(menu)
     }
     
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_resolve -> {
                 resolveConversation()
+                true
+            }
+            R.id.action_close -> {
+                closeConversation()
+                true
+            }
+            R.id.action_unresolve -> {
+                unresolveConversation()
+                true
+            }
+            R.id.action_reopen -> {
+                reopenConversation()
                 true
             }
             android.R.id.home -> {

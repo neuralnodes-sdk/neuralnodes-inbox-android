@@ -139,7 +139,7 @@
                 android:id="@+id/messagesRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="80dp"
+                android:layout_marginBottom="140dp"
                 android:clipToPadding="false"
                 android:paddingTop="8dp"
                 android:paddingStart="4dp"
@@ -162,7 +162,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|start"
                 android:layout_marginStart="16dp"
-                android:layout_marginBottom="84dp"
+                android:layout_marginBottom="144dp"
                 android:visibility="gone"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="16dp"
@@ -180,6 +180,56 @@
                     android:fontFamily="sans-serif-medium" />
 
             </com.google.android.material.card.MaterialCardView>
+
+            <!-- Action Buttons Container -->
+            <LinearLayout
+                android:id="@+id/actionButtonsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="72dp"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:gravity="center"
+                android:background="@android:color/white"
+                android:elevation="2dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/resolveButton"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:text="Resolve"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-medium"
+                    app:cornerRadius="8dp"
+                    app:backgroundTint="#10B981"
+                    app:icon="@android:drawable/ic_menu_close_clear_cancel"
+                    app:iconGravity="textStart"
+                    app:iconTint="@android:color/white"
+                    android:visibility="gone" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/endChatButton"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="End Chat"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-medium"
+                    app:cornerRadius="8dp"
+                    app:backgroundTint="#EF4444"
+                    app:icon="@android:drawable/ic_menu_close_clear_cancel"
+                    app:iconGravity="textStart"
+                    app:iconTint="@android:color/white"
+                    android:visibility="gone" />
+
+            </LinearLayout>
 
             <!-- Premium Input Container -->
             <com.google.android.material.card.MaterialCardView

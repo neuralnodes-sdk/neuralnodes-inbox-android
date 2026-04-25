@@ -80,6 +80,18 @@ class APIClient(private val apiKey: String, baseURL: String = "https://api.neura
         api.updateStatus(conversationId, mapOf("status" to status))
     }
     
+    suspend fun closeConversation(conversationId: String) {
+        api.updateStatus(conversationId, mapOf("status" to "closed"))
+    }
+    
+    suspend fun unresolveConversation(conversationId: String) {
+        api.updateStatus(conversationId, mapOf("status" to "active"))
+    }
+    
+    suspend fun reopenConversation(conversationId: String) {
+        api.updateStatus(conversationId, mapOf("status" to "active"))
+    }
+    
     // Device Registration
     suspend fun registerDevice(token: String, platform: String, deviceInfo: Map<String, String> = emptyMap()) {
         val deviceInfoJson = gson.toJson(deviceInfo)
@@ -138,6 +150,20 @@ class APIClient(private val apiKey: String, baseURL: String = "https://api.neura
         api.updateEscalationStatus(
             escalationId,
             UpdateEscalationStatusRequest(status, resolutionNotes)
+        )
+    }
+    
+    suspend fun resolveEscalation(escalationId: String) {
+        api.updateEscalationStatus(
+            escalationId,
+            UpdateEscalationStatusRequest("resolved", null)
+        )
+    }
+    
+    suspend fun endEscalation(escalationId: String) {
+        api.updateEscalationStatus(
+            escalationId,
+            UpdateEscalationStatusRequest("closed", "Chat ended by agent")
         )
     }
     
