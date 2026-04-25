@@ -104,7 +104,7 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Premium Send Button -->
+                <!-- Premium Send Button with Icon -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/sendButton"
                     android:layout_width="56dp"
@@ -115,13 +115,14 @@
                     android:insetBottom="0dp"
                     android:insetLeft="0dp"
                     android:insetRight="0dp"
-                    android:text="➤"
-                    android:textSize="20sp"
-                    android:textColor="@android:color/white"
+                    app:icon="@drawable/ic_send"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="24dp"
+                    app:iconTint="@android:color/white"
                     app:cornerRadius="28dp"
                     app:backgroundTint="#3B82F6"
-                    app:elevation="2dp"
-                    app:iconPadding="0dp" />
+                    app:elevation="2dp" />
 
             </LinearLayout>
 
