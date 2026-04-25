@@ -43,11 +43,12 @@ class EscalationAdapter(
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val nameText: TextView = itemView.findViewById(R.id.nameText)
         private val statusText: TextView = itemView.findViewById(R.id.statusText)
-        private val previewText: TextView = itemView.findViewById(R.id.previewText)
+        private val statusDot: View = itemView.findViewById(R.id.statusDot)
+        private val messagePreview: TextView = itemView.findViewById(R.id.messagePreview)
         private val timeText: TextView = itemView.findViewById(R.id.timeText)
-        private val unreadBadge: TextView = itemView.findViewById(R.id.unreadBadge)
+        private val unreadBadge: View = itemView.findViewById(R.id.unreadBadge)
+        private val unreadCount: TextView = itemView.findViewById(R.id.unreadCount)
         private val avatarText: TextView = itemView.findViewById(R.id.avatarText)
-        private val avatarBackground: View = itemView.findViewById(R.id.avatarBackground)
         
         fun bind(escalation: Escalation) {
             nameText.text = escalation.displayName
@@ -56,33 +57,33 @@ class EscalationAdapter(
             val initial = escalation.displayName.firstOrNull()?.uppercaseChar()?.toString() ?: "?"
             avatarText.text = initial
             
-            // Set status with appropriate badge
+            // Set status with appropriate color
             when (escalation.status) {
                 EscalationStatus.ACTIVE -> {
                     statusText.text = "Active"
-                    statusText.setBackgroundResource(R.drawable.status_badge_active)
+                    statusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(0xFF10B981.toInt())
                 }
                 EscalationStatus.PENDING -> {
                     statusText.text = "Pending"
-                    statusText.setBackgroundResource(R.drawable.status_badge_pending)
+                    statusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(0xFFF59E0B.toInt())
                 }
                 EscalationStatus.RESOLVED -> {
                     statusText.text = "Resolved"
-                    statusText.setBackgroundResource(R.drawable.status_badge_resolved)
+                    statusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(0xFF6B7280.toInt())
                 }
                 EscalationStatus.CLOSED -> {
                     statusText.text = "Closed"
-                    statusText.setBackgroundResource(R.drawable.status_badge_closed)
+                    statusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(0xFF6B7280.toInt())
                 }
             }
             
-            previewText.text = escalation.lastMessagePreview ?: "No messages yet"
+            messagePreview.text = escalation.lastMessagePreview ?: "No messages yet"
             timeText.text = formatTime(escalation.lastMessageAt ?: escalation.createdAt)
             
             // Show unread badge
             if (escalation.unreadCount > 0) {
                 unreadBadge.visibility = View.VISIBLE
-                unreadBadge.text = if (escalation.unreadCount > 9) "9+" else escalation.unreadCount.toString()
+                unreadCount.text = if (escalation.unreadCount > 9) "9+" else escalation.unreadCount.toString()
             } else {
                 unreadBadge.visibility = View.GONE
             }

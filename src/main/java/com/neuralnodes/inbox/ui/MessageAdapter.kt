@@ -65,7 +65,7 @@ class MessageAdapter : ListAdapter<Message, RecyclerView.ViewHolder>(MessageDiff
         
         fun bind(message: Message) {
             binding.messageText.text = message.messageText
-            binding.timeText.text = formatTime(message.createdAt)
+            binding.messageTime.text = formatTime(message.createdAt)
         }
     }
     
@@ -75,8 +75,7 @@ class MessageAdapter : ListAdapter<Message, RecyclerView.ViewHolder>(MessageDiff
         
         fun bind(message: Message) {
             binding.messageText.text = message.messageText
-            binding.timeText.text = formatTime(message.createdAt)
-            binding.senderText.text = message.displaySenderName
+            binding.messageTime.text = formatTime(message.createdAt)
         }
     }
     

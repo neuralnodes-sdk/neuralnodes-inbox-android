@@ -68,25 +68,21 @@ class ChatMessageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     
     class UserMessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val messageText: TextView = itemView.findViewById(R.id.messageText)
-        private val timeText: TextView = itemView.findViewById(R.id.timeText)
-        private val senderText: TextView? = itemView.findViewById(R.id.senderText)
+        private val messageTime: TextView = itemView.findViewById(R.id.messageTime)
         
         fun bind(message: ChatMessage) {
             messageText.text = message.messageText
-            timeText.text = formatTime(message.createdAt)
-            senderText?.text = message.displaySenderName
+            messageTime.text = formatTime(message.createdAt)
         }
     }
     
     class AgentMessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val messageText: TextView = itemView.findViewById(R.id.messageText)
-        private val timeText: TextView = itemView.findViewById(R.id.timeText)
-        private val senderText: TextView? = itemView.findViewById(R.id.senderText)
+        private val messageTime: TextView = itemView.findViewById(R.id.messageTime)
         
         fun bind(message: ChatMessage) {
             messageText.text = message.messageText
-            timeText.text = formatTime(message.createdAt)
-            senderText?.text = message.displaySenderName
+            messageTime.text = formatTime(message.createdAt)
         }
     }
 }

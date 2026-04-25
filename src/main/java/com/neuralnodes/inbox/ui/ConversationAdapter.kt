@@ -39,40 +39,43 @@ class ConversationAdapter(
         fun bind(conversation: Conversation) {
             binding.apply {
                 // Channel icon
-                iconText.text = conversation.channelIcon
+                channelIcon.text = conversation.channelIcon
                 
                 // Contact name
-                nameText.text = conversation.displayName
+                contactName.text = conversation.displayName
                 
-                // Last message
-                messageText.text = conversation.lastMessage ?: "No messages"
-                
-                // Time (shorter format)
-                timeText.text = formatTimeShort(conversation.updatedAt)
-                
-                // Channel badge with color
-                channelBadge.text = when (conversation.channel) {
-                    "webchat" -> "Web"
+                // Channel text
+                channelText.text = when (conversation.channel) {
+                    "webchat" -> "Web Chat"
                     "whatsapp" -> "WhatsApp"
                     "telegram" -> "Telegram"
                     "email" -> "Email"
-                    else -> conversation.channel.uppercase()
+                    else -> conversation.channel.capitalize()
                 }
                 
-                channelBadge.setBackgroundResource(when (conversation.channel) {
-                    "webchat" -> com.neuralnodes.inbox.R.drawable.channel_badge_webchat
-                    "whatsapp" -> com.neuralnodes.inbox.R.drawable.channel_badge_whatsapp
-                    "telegram" -> com.neuralnodes.inbox.R.drawable.channel_badge_telegram
-                    "email" -> com.neuralnodes.inbox.R.drawable.channel_badge_email
-                    else -> com.neuralnodes.inbox.R.drawable.status_badge_active
-                })
+                // Last message
+                lastMessage.text = conversation.lastMessage ?: "No messages"
+                
+                // Time (shorter format)
+                timestamp.text = formatTimeShort(conversation.updatedAt)
+                
+                // Status badge
+                statusBadge.text = conversation.status.capitalize()
+                statusBadge.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                    when (conversation.status.lowercase()) {
+                        "active" -> 0xFF3B82F6.toInt()
+                        "resolved" -> 0xFF10B981.toInt()
+                        "closed" -> 0xFF6B7280.toInt()
+                        else -> 0xFF3B82F6.toInt()
+                    }
+                )
                 
                 // Unread badge
                 if (conversation.unreadCount > 0) {
-                    badgeText.visibility = View.VISIBLE
-                    badgeText.text = if (conversation.unreadCount > 9) "9+" else conversation.unreadCount.toString()
+                    unreadBadge.visibility = View.VISIBLE
+                    unreadCount.text = if (conversation.unreadCount > 9) "9+" else conversation.unreadCount.toString()
                 } else {
-                    badgeText.visibility = View.GONE
+                    unreadBadge.visibility = View.GONE
                 }
                 
                 // Click listener
