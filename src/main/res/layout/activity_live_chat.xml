@@ -337,7 +337,7 @@
                         app:iconSize="24dp"
                         app:iconTint="@android:color/white"
                         app:cornerRadius="28dp"
-                        app:backgroundTint="#3B82F6"
+                        app:backgroundTint="@color/nn_primary"
                         app:elevation="4dp" />
 
                 </LinearLayout>

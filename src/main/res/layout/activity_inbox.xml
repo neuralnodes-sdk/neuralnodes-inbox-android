@@ -172,20 +172,20 @@
                     android:textSize="16sp"
                     android:alpha="0.95" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/retryButton"
-                    style="@style/Button.Primary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="52dp"
-                    android:layout_marginTop="32dp"
-                    android:text="Try Again"
-                    android:textColor="@android:color/white"
-                    android:paddingHorizontal="32dp"
-                    app:cornerRadius="26dp"
-                    app:backgroundTint="#3B82F6"
-                    app:icon="@android:drawable/ic_menu_rotate"
-                    app:iconTint="@android:color/white"
-                    app:elevation="4dp" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/retryButton"
+                        style="@style/Button.Primary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="32dp"
+                        android:text="Try Again"
+                        android:textColor="@android:color/white"
+                        android:paddingHorizontal="32dp"
+                        app:cornerRadius="26dp"
+                        app:backgroundTint="@color/nn_primary"
+                        app:icon="@android:drawable/ic_menu_rotate"
+                        app:iconTint="@android:color/white"
+                        app:elevation="4dp" />
 
             </LinearLayout>
 

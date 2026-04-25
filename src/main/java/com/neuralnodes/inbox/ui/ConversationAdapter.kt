@@ -59,14 +59,14 @@ class ConversationAdapter(
                 // Time (shorter format)
                 timestamp.text = formatTimeShort(conversation.updatedAt)
                 
-                // Status badge
+                <!-- Status badge -->
                 statusBadge.text = conversation.status.capitalize()
                 statusBadge.backgroundTintList = android.content.res.ColorStateList.valueOf(
                     when (conversation.status.lowercase()) {
-                        "active" -> 0xFF3B82F6.toInt()
+                        "active" -> 0xFF4A6EE0.toInt()
                         "resolved" -> 0xFF10B981.toInt()
                         "closed" -> 0xFF6B7280.toInt()
-                        else -> 0xFF3B82F6.toInt()
+                        else -> 0xFF4A6EE0.toInt()
                     }
                 )
                 
