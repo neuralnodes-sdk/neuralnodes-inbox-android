@@ -59,7 +59,7 @@ class ConversationAdapter(
                 // Time (shorter format)
                 timestamp.text = formatTimeShort(conversation.updatedAt)
                 
-                <!-- Status badge -->
+                // Status badge
                 statusBadge.text = conversation.status.capitalize()
                 statusBadge.backgroundTintList = android.content.res.ColorStateList.valueOf(
                     when (conversation.status.lowercase()) {

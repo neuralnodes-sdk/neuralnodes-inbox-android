@@ -6,12 +6,13 @@
     android:layout_height="match_parent"
     android:background="#F9FAFB">
 
-    <!-- Modern App Bar with Gradient -->
+    <!-- Modern App Bar with Gradient - Edge to Edge -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_gradient_header"
         android:elevation="0dp"
+        android:fitsSystemWindows="false"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -21,10 +22,16 @@
             android:background="@android:color/transparent"
             android:contentInsetStart="0dp"
             android:contentInsetEnd="0dp"
+            android:contentInsetLeft="0dp"
+            android:contentInsetRight="0dp"
             app:contentInsetStart="0dp"
             app:contentInsetEnd="0dp"
+            app:contentInsetLeft="0dp"
+            app:contentInsetRight="0dp"
             app:contentInsetStartWithNavigation="0dp"
             app:contentInsetEndWithActions="0dp"
+            app:titleMarginStart="0dp"
+            app:titleMarginEnd="0dp"
             app:title="Inbox"
             app:titleTextColor="#FFFFFF"
             app:navigationIconTint="#FFFFFF"

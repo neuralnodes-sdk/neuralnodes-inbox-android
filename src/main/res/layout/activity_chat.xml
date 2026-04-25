@@ -6,12 +6,13 @@
     android:layout_height="match_parent"
     android:background="#FFFFFF">
 
-    <!-- Modern App Bar with Gradient -->
+    <!-- Modern App Bar with Gradient - Edge to Edge -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_gradient_header"
         android:elevation="0dp"
+        android:fitsSystemWindows="false"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -21,10 +22,16 @@
             android:background="@android:color/transparent"
             android:contentInsetStart="0dp"
             android:contentInsetEnd="0dp"
+            android:contentInsetLeft="0dp"
+            android:contentInsetRight="0dp"
             app:contentInsetStart="0dp"
             app:contentInsetEnd="0dp"
+            app:contentInsetLeft="0dp"
+            app:contentInsetRight="0dp"
             app:contentInsetStartWithNavigation="0dp"
             app:contentInsetEndWithActions="0dp"
+            app:titleMarginStart="0dp"
+            app:titleMarginEnd="0dp"
             app:titleTextColor="#FFFFFF"
             app:navigationIconTint="#FFFFFF"
             app:menu="@menu/menu_chat"
@@ -46,10 +53,10 @@
             android:layout_height="match_parent"
             android:layout_marginBottom="88dp"
             android:clipToPadding="false"
-            android:paddingTop="16dp"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="24dp"
+            android:paddingTop="8dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="32dp"
             android:scrollbars="none"
             android:overScrollMode="never"
             android:background="#FFFFFF" />
