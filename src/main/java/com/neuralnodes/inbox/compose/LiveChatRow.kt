@@ -74,15 +74,13 @@ fun LiveChatRow(
             }
             
             // Last message preview
-            escalation.lastMessagePreview?.let { preview ->
-                Text(
-                    text = preview,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Color(0xFF6B7280),
-                    maxLines = 1
-                )
-            }
+            Text(
+                text = escalation.lastMessagePreview,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Normal,
+                color = Color(0xFF6B7280),
+                maxLines = 1
+            )
             
             // Status and Unread
             Row(
@@ -118,20 +116,18 @@ fun LiveChatRow(
                 }
                 
                 // Unread Badge
-                escalation.unreadCount?.let { count ->
-                    if (count > 0) {
-                        Surface(
-                            shape = RoundedCornerShape(10.dp),
-                            color = Color(0xFFEF4444)
-                        ) {
-                            Text(
-                                text = count.toString(),
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
-                        }
+                if (escalation.unreadCount > 0) {
+                    Surface(
+                        shape = RoundedCornerShape(10.dp),
+                        color = Color(0xFFEF4444)
+                    ) {
+                        Text(
+                            text = escalation.unreadCount.toString(),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        )
                     }
                 }
             }

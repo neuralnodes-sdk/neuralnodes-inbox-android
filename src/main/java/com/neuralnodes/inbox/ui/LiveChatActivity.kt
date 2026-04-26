@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -68,6 +69,17 @@ class LiveChatActivity : AppCompatActivity() {
             // Fallback: create new instance (shouldn't happen in production)
             pusherClient = PusherClient(apiKey, "https://api.neuralnodes.space")
         }
+        
+        // Setup back press handler
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (binding.chatContainer.visibility == View.VISIBLE) {
+                    showEscalationsList()
+                } else {
+                    finish()
+                }
+            }
+        })
         
         setupUI()
         loadEscalations()
@@ -713,13 +725,5 @@ class LiveChatActivity : AppCompatActivity() {
         // Clear messages
         messages.clear()
         messageAdapter.submitList(messages)
-    }
-    
-    override fun onBackPressed() {
-        if (binding.chatContainer.visibility == View.VISIBLE) {
-            showEscalationsList()
-        } else {
-            super.onBackPressed()
-        }
     }
 }

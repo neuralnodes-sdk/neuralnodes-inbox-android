@@ -45,7 +45,9 @@ class ConversationAdapter(
                 contactName.text = conversation.displayName
                 
                 // Status - minimal dot + text
-                statusText.text = conversation.status.capitalize()
+                statusText.text = conversation.status.replaceFirstChar { 
+                    if (it.isLowerCase()) it.titlecase() else it.toString() 
+                }
                 val statusColor = when (conversation.status.lowercase()) {
                     "active" -> 0xFF10B981.toInt()
                     "resolved" -> 0xFF6B7280.toInt()

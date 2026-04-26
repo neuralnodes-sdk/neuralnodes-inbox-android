@@ -2,6 +2,7 @@ package com.neuralnodes.inbox.compose
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -68,7 +69,7 @@ fun InboxTabView(
                 NavigationBarItem(
                     icon = { 
                         Icon(
-                            imageVector = Icons.Default.Send,
+                            imageVector = Icons.AutoMirrored.Filled.Send,
                             contentDescription = "Live Chat",
                             modifier = Modifier.size(24.dp)
                         )
@@ -164,7 +165,7 @@ private fun LiveChatListView(sdk: NeuralNodesInbox) {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SettingsView(sdk: NeuralNodesInbox) {
+private fun SettingsView(@Suppress("UNUSED_PARAMETER") sdk: NeuralNodesInbox) {
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(
             title = { 

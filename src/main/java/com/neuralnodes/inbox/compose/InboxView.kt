@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -143,6 +144,7 @@ private fun FilterChipsRow(
     val activeCount = conversations.count { it.status == "active" }
     val pendingCount = conversations.count { it.status == "pending" }
     val resolvedCount = conversations.count { it.status == "resolved" }
+    @Suppress("UNUSED_VARIABLE")
     val closedCount = conversations.count { it.status == "closed" }
     
     Row(
@@ -355,11 +357,11 @@ private fun getChannelColor(channel: String): Color {
  */
 private fun getChannelIcon(channel: String): ImageVector {
     return when (channel.lowercase()) {
-        "webchat" -> Icons.Default.Send
+        "webchat" -> Icons.AutoMirrored.Filled.Send
         "whatsapp" -> Icons.Default.Phone
-        "telegram" -> Icons.Default.Send
+        "telegram" -> Icons.AutoMirrored.Filled.Send
         "email" -> Icons.Default.Email
-        else -> Icons.Default.Send
+        else -> Icons.AutoMirrored.Filled.Send
     }
 }
 

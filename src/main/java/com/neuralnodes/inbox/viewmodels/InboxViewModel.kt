@@ -11,11 +11,13 @@ import com.neuralnodes.inbox.utils.NeuralNodesLogger
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 
 /**
  * ViewModel for Inbox - Exact match to iOS SDK InboxViewModel
  */
+@OptIn(FlowPreview::class)
 class InboxViewModel(private val sdk: NeuralNodesInbox) : ViewModel() {
     
     private val apiClient = sdk.getAPIClient()

@@ -80,7 +80,7 @@ class LiveChatListViewModel(private val sdk: NeuralNodesInbox) : ViewModel() {
         }
     }
     
-    fun loadEscalations(status: String? = null) {
+    fun loadEscalations(@Suppress("UNUSED_PARAMETER") status: String? = null) {
         NeuralNodesLogger.info("[LIVE CHAT LIST] loadEscalations started")
         
         // Prevent concurrent API calls

@@ -218,8 +218,8 @@ class APIClient(private val apiKey: String, baseURL: String = "https://api.neura
     }
     
     suspend fun searchMessagesInConversation(
-        conversationId: String,
-        query: String,
+        @Suppress("UNUSED_PARAMETER") conversationId: String,
+        @Suppress("UNUSED_PARAMETER") query: String,
         limit: Int,
         offset: Int
     ): SearchMessagesResponse {
@@ -244,7 +244,10 @@ class APIClient(private val apiKey: String, baseURL: String = "https://api.neura
         )
     }
     
-    suspend fun getSearchSuggestions(query: String, limit: Int): SearchSuggestionsResponse {
+    suspend fun getSearchSuggestions(
+        @Suppress("UNUSED_PARAMETER") query: String,
+        @Suppress("UNUSED_PARAMETER") limit: Int
+    ): SearchSuggestionsResponse {
         // Placeholder - implement when backend API is ready
         return SearchSuggestionsResponse(suggestions = emptyList())
     }

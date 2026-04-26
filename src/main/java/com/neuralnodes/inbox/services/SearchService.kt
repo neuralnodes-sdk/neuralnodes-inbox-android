@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.*
  * Search service with debouncing for efficient API calls
  * Exact match to iOS SearchService implementation
  */
+@OptIn(FlowPreview::class)
 class SearchService(
     private val apiClient: APIClient,
     private val debounceInterval: Long = 300L // milliseconds
