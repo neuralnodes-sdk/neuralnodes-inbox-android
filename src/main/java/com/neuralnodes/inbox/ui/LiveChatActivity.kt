@@ -684,8 +684,7 @@ class LiveChatActivity : AppCompatActivity() {
         typingTimeoutRunnable?.let { typingTimeoutHandler?.removeCallbacks(it) }
         
         // Unsubscribe from all channels
-        activeEscalation?.let { pusherClient.unsubscribe("private-escalation-${it.id}") }
-        clientId?.let { pusherClient.unsubscribe("private-client-$it") }
+        activeEscalation?.let { pusherClient.unsubscribeFromEscalation(it.id) }
         
         println("✅ LiveChatActivity destroyed and cleaned up")
     }

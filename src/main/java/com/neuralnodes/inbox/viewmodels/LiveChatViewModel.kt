@@ -61,7 +61,7 @@ class LiveChatViewModel(
                 _isConnected.value = true
                 
                 // Subscribe to Pusher channel
-                pusherClient.subscribeToEscalation(escalationId, onMessage = { message ->
+                pusherClient?.subscribeToEscalation(escalationId, onMessage = { message ->
                     NeuralNodesLogger.info("[LIVE CHAT VM] Received message from Pusher: ${message.messageText}")
                     
                     // Check if message already exists by ID
@@ -96,7 +96,7 @@ class LiveChatViewModel(
     }
     
     fun disconnect() {
-        pusherClient.unsubscribe(escalationId)
+        pusherClient?.unsubscribeFromEscalation(escalationId)
         _isConnected.value = false
     }
     

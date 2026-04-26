@@ -47,7 +47,7 @@ class LiveChatListViewModel(private val sdk: NeuralNodesInbox) : ViewModel() {
                 
                 NeuralNodesLogger.info("[LIVE CHAT LIST] Client ID: $clientId")
                 
-                pusherClient.subscribeToEscalationList(clientId) {
+                pusherClient?.subscribeToEscalationList(clientId) {
                     NeuralNodesLogger.info("[LIVE CHAT LIST] Pusher callback triggered - scheduling refresh")
                     viewModelScope.launch {
                         loadEscalationsWithDebounce()
