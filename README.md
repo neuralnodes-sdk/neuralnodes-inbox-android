@@ -26,7 +26,9 @@ A powerful, flexible Android SDK for integrating customer support inbox function
 
 ## Installation
 
-### Gradle (Kotlin DSL)
+### Option 1: JitPack (Recommended - No Authentication)
+
+#### Gradle (Kotlin DSL)
 
 Add JitPack repository to your `settings.gradle.kts`:
 
@@ -45,11 +47,11 @@ Add the SDK to your app's `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("com.github.neuralnodes-sdk:neuralnodes-inbox-android:2.2.8")
+    implementation("com.github.neuralnodes-sdk:neuralnodes-inbox-android:2.3.3")
 }
 ```
 
-### Gradle (Groovy)
+#### Gradle (Groovy)
 
 Add JitPack repository to your `settings.gradle`:
 
@@ -68,13 +70,86 @@ Add the SDK to your app's `build.gradle`:
 
 ```gradle
 dependencies {
-    implementation 'com.github.neuralnodes-sdk:neuralnodes-inbox-android:2.2.8'
+    implementation 'com.github.neuralnodes-sdk:neuralnodes-inbox-android:2.3.3'
 }
 ```
 
 That's it! No authentication needed.
 
-### Alternative: Direct AAR Download
+---
+
+### Option 2: GitHub Packages (Requires Authentication)
+
+#### Gradle (Kotlin DSL)
+
+Add GitHub Packages repository to your `settings.gradle.kts`:
+
+```kotlin
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url = uri("https://maven.pkg.github.com/neuralnodes-sdk/neuralnodes-inbox-android")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
+            }
+        }
+    }
+}
+```
+
+Add your GitHub credentials to `~/.gradle/gradle.properties`:
+
+```properties
+gpr.user=YOUR_GITHUB_USERNAME
+gpr.key=YOUR_GITHUB_PERSONAL_ACCESS_TOKEN
+```
+
+Add the SDK to your app's `build.gradle.kts`:
+
+```kotlin
+dependencies {
+    implementation("com.github.neuralnodes-sdk:neuralnodes-inbox-android:2.3.3")
+}
+```
+
+#### Gradle (Groovy)
+
+Add GitHub Packages repository to your `settings.gradle`:
+
+```gradle
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url = uri("https://maven.pkg.github.com/neuralnodes-sdk/neuralnodes-inbox-android")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+            }
+        }
+    }
+}
+```
+
+Add the SDK to your app's `build.gradle`:
+
+```gradle
+dependencies {
+    implementation 'com.github.neuralnodes-sdk:neuralnodes-inbox-android:2.3.3'
+}
+```
+
+**Note:** You need a GitHub Personal Access Token with `read:packages` scope. [Create one here](https://github.com/settings/tokens/new?scopes=read:packages).
+
+---
+
+### Option 3: Direct AAR Download
 
 If you prefer not to use Maven Central, you can download the AAR directly:
 

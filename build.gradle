@@ -138,6 +138,45 @@ afterEvaluate {
                 groupId = 'com.github.neuralnodes-sdk'
                 artifactId = 'neuralnodes-inbox-android'
                 version = getVersionFromSDKVersion()
+                
+                pom {
+                    name = 'NeuralNodes Inbox Android SDK'
+                    description = 'Android SDK for NeuralNodes Inbox - Multi-tenant customer communication platform'
+                    url = 'https://github.com/neuralnodes-sdk/neuralnodes-inbox-android'
+                    
+                    licenses {
+                        license {
+                            name = 'MIT License'
+                            url = 'https://opensource.org/licenses/MIT'
+                        }
+                    }
+                    
+                    developers {
+                        developer {
+                            id = 'neuralnodes'
+                            name = 'Neural Nodes'
+                            email = 'neural.nodes.ai@gmail.com'
+                        }
+                    }
+                    
+                    scm {
+                        connection = 'scm:git:git://github.com/neuralnodes-sdk/neuralnodes-inbox-android.git'
+                        developerConnection = 'scm:git:ssh://github.com/neuralnodes-sdk/neuralnodes-inbox-android.git'
+                        url = 'https://github.com/neuralnodes-sdk/neuralnodes-inbox-android'
+                    }
+                }
+            }
+        }
+        
+        repositories {
+            // GitHub Packages
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/neuralnodes-sdk/neuralnodes-inbox-android")
+                credentials {
+                    username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("gpr.user")
+                    password = System.getenv("GITHUB_TOKEN") ?: project.findProperty("gpr.key")
+                }
             }
         }
     }

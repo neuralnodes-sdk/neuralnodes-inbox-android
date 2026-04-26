@@ -128,18 +128,43 @@ jobs:
           echo "✅ Build completed successfully"
           echo "📦 Android SDK is ready for distribution"
       
+      - name: Publish to GitHub Packages
+        if: steps.version_changed.outputs.changed == 'true' && steps.check_tag.outputs.exists == 'false'
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+          echo "📦 Publishing to GitHub Packages..."
+          
+          # Publish to GitHub Packages
+          ./gradlew publish --no-daemon --stacktrace
+          
+          echo "✅ Published to GitHub Packages!"
+          echo "📦 Package available at:"
+          echo "   maven { url 'https://maven.pkg.github.com/${{ github.repository }}' }"
+          echo "   implementation 'com.github.neuralnodes-sdk:neuralnodes-inbox-android:$VERSION'"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+      
       - name: Trigger JitPack Build
         if: steps.version_changed.outputs.changed == 'true' && steps.check_tag.outputs.exists == 'false'
         run: |
           VERSION="${{ steps.get_version.outputs.version }}"
           echo "🚀 Triggering JitPack build for version $VERSION..."
           
-          # Trigger JitPack build immediately
-          curl -X POST "https://jitpack.io/api/builds/com.github.neuralnodes-sdk/neuralnodes-inbox-android/$VERSION"
+          # JitPack builds automatically when a tag is pushed
+          # We can verify the build status with a GET request
+          echo "📦 JitPack will build automatically from tag v$VERSION"
+          echo "🔗 Build status: https://jitpack.io/com/github/neuralnodes-sdk/neuralnodes-inbox-android/$VERSION"
           
-          echo "✅ JitPack build triggered!"
+          # Optional: Trigger immediate build by accessing the lookup endpoint
+          curl -s "https://jitpack.io/api/builds/com.github.neuralnodes-sdk/neuralnodes-inbox-android/$VERSION" || true
+          
+          echo "✅ JitPack notified!"
           echo "📦 Package will be available at:"
           echo "   implementation 'com.github.neuralnodes-sdk:neuralnodes-inbox-android:$VERSION'"
+          echo ""
+          echo "⏱️  Build typically takes 2-5 minutes"
+          echo "🔍 Check build status at: https://jitpack.io/#neuralnodes-sdk/neuralnodes-inbox-android/$VERSION"
       
       - name: Create Git tag
         if: steps.version_changed.outputs.changed == 'true' && steps.check_tag.outputs.exists == 'false'
@@ -198,6 +223,24 @@ jobs:
           echo ""
           echo "📦 Installation instructions:"
           echo ""
+          echo "=== Option 1: JitPack (No authentication required) ==="
+          echo ""
+          echo "Add to your settings.gradle:"
+          echo ""
+          echo "dependencyResolutionManagement {"
+          echo "    repositories {"
+          echo "        maven { url 'https://jitpack.io' }"
+          echo "    }"
+          echo "}"
+          echo ""
+          echo "Add to your build.gradle:"
+          echo ""
+          echo "dependencies {"
+          echo "    implementation 'com.github.neuralnodes-sdk:neuralnodes-inbox-android:${{ steps.get_version.outputs.version }}'"
+          echo "}"
+          echo ""
+          echo "=== Option 2: GitHub Packages (Requires authentication) ==="
+          echo ""
           echo "Add to your settings.gradle:"
           echo ""
           echo "dependencyResolutionManagement {"
@@ -218,7 +261,9 @@ jobs:
           echo "    implementation 'com.github.neuralnodes-sdk:neuralnodes-inbox-android:${{ steps.get_version.outputs.version }}'"
           echo "}"
           echo ""
-          echo "Or download AAR directly from:"
+          echo "=== Option 3: Direct AAR Download ==="
+          echo ""
+          echo "Download AAR directly from:"
           echo "https://github.com/${{ github.repository }}/releases/download/v${{ steps.get_version.outputs.version }}/neuralnodes-inbox-android-${{ steps.get_version.outputs.version }}.aar"
       
       - name: Validation-only summary
@@ -275,7 +320,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Published to:*\n• JitPack (https://jitpack.io)\n• GitHub Releases (AAR download)"
+                    "text": "*Published to:*\n• JitPack (https://jitpack.io) - No auth required\n• GitHub Packages (https://maven.pkg.github.com) - Requires GitHub token\n• GitHub Releases (AAR download)"
                   }
                 },
                 {
