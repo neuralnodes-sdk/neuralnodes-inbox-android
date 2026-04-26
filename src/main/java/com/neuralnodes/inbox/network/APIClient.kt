@@ -64,6 +64,12 @@ class APIClient(private val apiKey: String, baseURL: String = "https://api.neura
         offset: Int = 0
     ): List<Conversation> = api.getConversations(channel, status, limit, offset).conversations
     
+    // Get single conversation (matching iOS SDK)
+    suspend fun getConversation(id: String): Conversation {
+        val response = api.getConversation(id)
+        return response.conversation
+    }
+    
     // Messages
     suspend fun getMessages(conversationId: String, limit: Int = 100, offset: Int = 0): List<Message> =
         api.getMessages(conversationId, limit, offset).messages
@@ -194,9 +200,16 @@ class APIClient(private val apiKey: String, baseURL: String = "https://api.neura
     }
     
     // Search methods for SearchService
-    suspend fun searchConversations(filters: com.neuralnodes.inbox.services.ConversationSearchFilters): com.neuralnodes.inbox.services.SearchConversationsResponse {
+    suspend fun searchConversations(filters: ConversationSearchFilters): SearchConversationsResponse {
         // Placeholder - implement when backend API is ready
-        return com.neuralnodes.inbox.services.SearchConversationsResponse(emptyList(), 0, false)
+        return SearchConversationsResponse(
+            results = emptyList(),
+            totalCount = 0,
+            pageSize = filters.limit,
+            offset = filters.offset,
+            hasMore = false,
+            error = null
+        )
     }
     
     suspend fun searchMessagesInConversation(
@@ -204,19 +217,31 @@ class APIClient(private val apiKey: String, baseURL: String = "https://api.neura
         query: String,
         limit: Int,
         offset: Int
-    ): com.neuralnodes.inbox.services.SearchMessagesResponse {
+    ): SearchMessagesResponse {
         // Placeholder - implement when backend API is ready
-        return com.neuralnodes.inbox.services.SearchMessagesResponse(emptyList(), 0, false)
+        return SearchMessagesResponse(
+            results = emptyList(),
+            totalCount = 0,
+            pageSize = limit,
+            offset = offset,
+            hasMore = false
+        )
     }
     
-    suspend fun searchAllMessages(filters: com.neuralnodes.inbox.services.MessageSearchFilters): com.neuralnodes.inbox.services.SearchMessagesResponse {
+    suspend fun searchAllMessages(filters: MessageSearchFilters): SearchMessagesResponse {
         // Placeholder - implement when backend API is ready
-        return com.neuralnodes.inbox.services.SearchMessagesResponse(emptyList(), 0, false)
+        return SearchMessagesResponse(
+            results = emptyList(),
+            totalCount = 0,
+            pageSize = filters.limit,
+            offset = filters.offset,
+            hasMore = false
+        )
     }
     
-    suspend fun getSearchSuggestions(query: String, limit: Int): com.neuralnodes.inbox.services.SearchSuggestionsResponse {
+    suspend fun getSearchSuggestions(query: String, limit: Int): SearchSuggestionsResponse {
         // Placeholder - implement when backend API is ready
-        return com.neuralnodes.inbox.services.SearchSuggestionsResponse(emptyList())
+        return SearchSuggestionsResponse(suggestions = emptyList())
     }
     
     // Client Info (for getting client ID)
@@ -236,6 +261,9 @@ interface InboxAPI {
         @Query("limit") limit: Int,
         @Query("offset") offset: Int
     ): ConversationsResponse
+    
+    @GET("/client-portal/inbox/conversations/{id}")
+    suspend fun getConversation(@Path("id") id: String): ConversationResponse
     
     @GET("/client-portal/inbox/conversations/{id}/messages")
     suspend fun getMessages(
@@ -321,6 +349,11 @@ interface InboxAPI {
 data class EscalationResponse(
     @SerializedName("success") val success: Boolean,
     @SerializedName("escalation") val escalation: Escalation
+)
+
+data class ConversationResponse(
+    @SerializedName("success") val success: Boolean,
+    @SerializedName("conversation") val conversation: Conversation
 )
 
 data class ClientInfoResponse(

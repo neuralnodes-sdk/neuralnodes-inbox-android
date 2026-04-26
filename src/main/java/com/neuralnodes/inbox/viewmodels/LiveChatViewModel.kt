@@ -4,102 +4,178 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.neuralnodes.inbox.NeuralNodesInbox
 import com.neuralnodes.inbox.models.ChatMessage
-import com.neuralnodes.inbox.models.Escalation
+import com.neuralnodes.inbox.utils.NeuralNodesLogger
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.*
 
 /**
- * ViewModel for Live Chat - shared between Activity and Composable
+ * ViewModel for Live Chat - Exact match to iOS SDK LiveChatViewModel
  */
 class LiveChatViewModel(
-    private val escalationId: String,
+    val escalationId: String,
     private val sdk: NeuralNodesInbox
 ) : ViewModel() {
     
-    private val apiClient = sdk.getAPIClient()
+    private val liveChatClient = sdk.getLiveChatClient()
     private val pusherClient = sdk.getPusherClient()
     
     private val _messages = MutableStateFlow<List<ChatMessage>>(emptyList())
     val messages: StateFlow<List<ChatMessage>> = _messages.asStateFlow()
     
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
-    
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error.asStateFlow()
-    
-    private val _isTyping = MutableStateFlow(false)
-    val isTyping: StateFlow<Boolean> = _isTyping.asStateFlow()
+    private val _messageText = MutableStateFlow("")
+    val messageText: StateFlow<String> = _messageText.asStateFlow()
     
     private val _isConnected = MutableStateFlow(true)
     val isConnected: StateFlow<Boolean> = _isConnected.asStateFlow()
     
+    private val _isTyping = MutableStateFlow(false)
+    val isTyping: StateFlow<Boolean> = _isTyping.asStateFlow()
+    
+    private val _isSending = MutableStateFlow(false)
+    val isSending: StateFlow<Boolean> = _isSending.asStateFlow()
+    
+    private val _isLoadingMore = MutableStateFlow(false)
+    val isLoadingMore: StateFlow<Boolean> = _isLoadingMore.asStateFlow()
+    
+    private val _hasMoreMessages = MutableStateFlow(true)
+    val hasMoreMessages: StateFlow<Boolean> = _hasMoreMessages.asStateFlow()
+    
+    private val _scrollToMessageId = MutableStateFlow<String?>(null)
+    val scrollToMessageId: StateFlow<String?> = _scrollToMessageId.asStateFlow()
+    
     private val _currentStatus = MutableStateFlow("active")
     val currentStatus: StateFlow<String> = _currentStatus.asStateFlow()
     
-    private val _messageText = MutableStateFlow("")
-    val messageText: StateFlow<String> = _messageText.asStateFlow()
+    private val pageSize = 15
+    private var currentOffset = 0
+    private var isInitialLoad = true
     
-    init {
-        loadMessages()
-        subscribeToEscalation()
-    }
-    
-    fun loadMessages() {
+    fun connect() {
         viewModelScope.launch {
-            _isLoading.value = true
-            _error.value = null
-            
             try {
-                val loadedMessages = apiClient.getEscalationMessages(escalationId, limit = 100)
-                _messages.value = loadedMessages.sortedBy { it.createdAt }
+                delay(500)
+                _isConnected.value = true
+                
+                // Subscribe to Pusher channel
+                pusherClient.subscribeToEscalation(escalationId, onMessage = { message ->
+                    NeuralNodesLogger.info("[LIVE CHAT VM] Received message from Pusher: ${message.messageText}")
+                    
+                    // Check if message already exists by ID
+                    if (_messages.value.any { it.id == message.id }) {
+                        NeuralNodesLogger.warning("[LIVE CHAT VM] Message with ID ${message.id} already exists, skipping")
+                        return@subscribeToEscalation
+                    }
+                    
+                    // Also check for duplicates by content and timestamp (within 2 seconds)
+                    val isDuplicate = _messages.value.any { existingMsg ->
+                        existingMsg.messageText == message.messageText &&
+                        existingMsg.senderType == message.senderType &&
+                        kotlin.math.abs(existingMsg.createdAt.time - message.createdAt.time) < 2000
+                    }
+                    
+                    if (isDuplicate) {
+                        NeuralNodesLogger.warning("[LIVE CHAT VM] Duplicate message detected by content/timestamp, skipping")
+                        return@subscribeToEscalation
+                    }
+                    
+                    NeuralNodesLogger.info("[LIVE CHAT VM] Adding message to list")
+                    _messages.value = _messages.value + message
+                    _scrollToMessageId.value = message.id
+                    NeuralNodesLogger.info("[LIVE CHAT VM] Message added, total messages: ${_messages.value.size}")
+                }, onTyping = { isTyping ->
+                    _isTyping.value = isTyping
+                })
             } catch (e: Exception) {
-                _error.value = e.message ?: "Failed to load messages"
-            } finally {
-                _isLoading.value = false
+                _isConnected.value = false
             }
         }
     }
     
-    fun sendMessage(text: String) {
-        if (text.isBlank()) return
-        
+    fun disconnect() {
+        pusherClient.unsubscribe(escalationId)
+        _isConnected.value = false
+    }
+    
+    fun loadMessages() {
         viewModelScope.launch {
+            NeuralNodesLogger.info("[LIVE CHAT VM] loadMessages started for escalation: $escalationId")
+            currentOffset = 0
+            _hasMoreMessages.value = true
+            isInitialLoad = true
+            
             try {
-                // Optimistic update
-                val optimisticMessage = ChatMessage(
-                    id = "temp_${System.currentTimeMillis()}",
+                // Load escalation details to get current status
+                NeuralNodesLogger.info("[LIVE CHAT VM] Fetching escalation details...")
+                val escalation = liveChatClient.getEscalation(escalationId)
+                _currentStatus.value = escalation.status
+                NeuralNodesLogger.info("[LIVE CHAT VM] Escalation status: ${escalation.status}")
+                
+                NeuralNodesLogger.info("[LIVE CHAT VM] Fetching messages...")
+                val fetchedMessages = liveChatClient.getEscalationMessages(
                     escalationId = escalationId,
-                    messageType = "text",
-                    messageText = text,
-                    senderType = "agent",
-                    senderName = "You",
-                    senderId = null,
-                    attachmentUrl = null,
-                    attachmentType = null,
-                    isRead = true,
-                    readAt = null,
-                    createdAt = java.util.Date()
+                    limit = pageSize,
+                    offset = currentOffset
                 )
                 
-                _messages.value = _messages.value + optimisticMessage
-                _messageText.value = ""
+                NeuralNodesLogger.info("[LIVE CHAT VM] Received ${fetchedMessages.size} messages")
+                _messages.value = fetchedMessages.sortedBy { it.createdAt }
+                _hasMoreMessages.value = fetchedMessages.size == pageSize
+                currentOffset = pageSize
                 
-                // Send to server
-                val serverMessage = apiClient.sendClientMessage(escalationId, text)
+                // Mark messages as read
+                NeuralNodesLogger.info("[LIVE CHAT VM] Marking messages as read...")
+                liveChatClient.markEscalationMessagesRead(escalationId)
+                NeuralNodesLogger.info("[LIVE CHAT VM] Messages marked as read")
                 
-                // Replace optimistic with server message
-                _messages.value = _messages.value.map {
-                    if (it.id == optimisticMessage.id) serverMessage else it
+                // Scroll to bottom after messages loaded
+                fetchedMessages.lastOrNull()?.let {
+                    _scrollToMessageId.value = it.id
+                    NeuralNodesLogger.info("[LIVE CHAT VM] Scrolling to last message: ${it.id}")
                 }
                 
+                // Mark as no longer initial load after delay
+                viewModelScope.launch {
+                    delay(1000)
+                    isInitialLoad = false
+                }
             } catch (e: Exception) {
-                // Rollback on error
-                _messages.value = _messages.value.filter { it.id != "temp_${System.currentTimeMillis()}" }
-                _error.value = e.message ?: "Failed to send message"
-                _messageText.value = text // Restore text
+                NeuralNodesLogger.error("[LIVE CHAT VM] Error loading messages", e)
+            }
+        }
+    }
+    
+    fun loadMoreMessages() {
+        if (_isLoadingMore.value || !_hasMoreMessages.value || isInitialLoad) {
+            return
+        }
+        
+        viewModelScope.launch {
+            _isLoadingMore.value = true
+            
+            try {
+                val fetchedMessages = liveChatClient.getEscalationMessages(
+                    escalationId = escalationId,
+                    limit = pageSize,
+                    offset = currentOffset
+                )
+                
+                // Filter out duplicates before inserting
+                val existingIds = _messages.value.map { it.id }.toSet()
+                val newMessages = fetchedMessages.filter { it.id !in existingIds }
+                
+                // Insert older messages at the beginning
+                val sortedNewMessages = newMessages.sortedBy { it.createdAt }
+                _messages.value = sortedNewMessages + _messages.value
+                
+                _hasMoreMessages.value = fetchedMessages.size == pageSize
+                currentOffset += fetchedMessages.size
+                _isLoadingMore.value = false
+            } catch (e: Exception) {
+                _isLoadingMore.value = false
             }
         }
     }
@@ -108,24 +184,103 @@ class LiveChatViewModel(
         _messageText.value = text
     }
     
-    fun resolveChat() {
+    fun sendMessage() {
+        val text = _messageText.value.trim()
+        if (text.isEmpty()) return
+        
         viewModelScope.launch {
+            _messageText.value = ""
+            _isSending.value = true
+            
+            // Create optimistic message
+            val optimisticMessage = ChatMessage(
+                id = "temp-${UUID.randomUUID()}",
+                escalationId = escalationId,
+                messageType = "text",
+                messageText = text,
+                senderType = "agent",
+                senderName = "You",
+                senderId = null,
+                attachmentUrl = null,
+                attachmentType = null,
+                attachmentName = null,
+                isRead = false,
+                readAt = null,
+                createdAt = Date()
+            )
+            
+            // Add optimistic message immediately
+            _messages.value = _messages.value + optimisticMessage
+            
+            // Trigger scroll to new message
+            _scrollToMessageId.value = optimisticMessage.id
+            
             try {
-                apiClient.resolveEscalation(escalationId)
-                _currentStatus.value = "resolved"
+                val sentMessage = liveChatClient.sendEscalationMessage(
+                    escalationId = escalationId,
+                    text = text
+                )
+                
+                // Replace optimistic message with real one
+                val index = _messages.value.indexOfFirst { it.id == optimisticMessage.id }
+                if (index != -1) {
+                    val updatedMessages = _messages.value.toMutableList()
+                    updatedMessages[index] = sentMessage
+                    _messages.value = updatedMessages
+                    // Trigger scroll to real message
+                    _scrollToMessageId.value = sentMessage.id
+                }
+                
+                _isSending.value = false
             } catch (e: Exception) {
-                _error.value = e.message ?: "Failed to resolve chat"
+                // Remove optimistic message on error
+                _messages.value = _messages.value.filter { it.id != optimisticMessage.id }
+                _messageText.value = text
+                _isSending.value = false
             }
         }
     }
     
-    fun endChat() {
+    fun endChat(reason: String? = null) {
         viewModelScope.launch {
             try {
-                apiClient.endEscalation(escalationId)
+                liveChatClient.endEscalation(escalationId, reason)
                 _currentStatus.value = "closed"
             } catch (e: Exception) {
-                _error.value = e.message ?: "Failed to end chat"
+                // Silently fail
+            }
+        }
+    }
+    
+    fun acceptChat() {
+        viewModelScope.launch {
+            try {
+                liveChatClient.updateEscalationStatus(escalationId, "active")
+                _currentStatus.value = "active"
+            } catch (e: Exception) {
+                // Silently fail
+            }
+        }
+    }
+    
+    fun resolveChat(notes: String? = null) {
+        viewModelScope.launch {
+            try {
+                liveChatClient.resolveEscalation(escalationId, notes)
+                _currentStatus.value = "resolved"
+            } catch (e: Exception) {
+                // Silently fail
+            }
+        }
+    }
+    
+    fun closeChat() {
+        viewModelScope.launch {
+            try {
+                liveChatClient.updateEscalationStatus(escalationId, "closed")
+                _currentStatus.value = "closed"
+            } catch (e: Exception) {
+                // Silently fail
             }
         }
     }
@@ -133,47 +288,16 @@ class LiveChatViewModel(
     fun reopenChat() {
         viewModelScope.launch {
             try {
-                // API call to reopen
+                liveChatClient.updateEscalationStatus(escalationId, "active")
                 _currentStatus.value = "active"
             } catch (e: Exception) {
-                _error.value = e.message ?: "Failed to reopen chat"
-            }
-        }
-    }
-    
-    fun clearError() {
-        _error.value = null
-    }
-    
-    private fun subscribeToEscalation() {
-        pusherClient?.let { client ->
-            viewModelScope.launch {
-                try {
-                    client.subscribeToEscalation(
-                        escalationId,
-                        onNewMessage = { message ->
-                            val currentMessages = _messages.value.toMutableList()
-                            if (!currentMessages.any { it.id == message.id }) {
-                                currentMessages.add(message)
-                                _messages.value = currentMessages.sortedBy { it.createdAt }
-                            }
-                        },
-                        onTypingIndicator = { indicator ->
-                            _isTyping.value = indicator.isTyping
-                        },
-                        onStatusChanged = { data ->
-                            _currentStatus.value = data["status"] as? String ?: "active"
-                        }
-                    ).collect { /* Handle events */ }
-                } catch (e: Exception) {
-                    _error.value = "Connection error: ${e.message}"
-                }
+                // Silently fail
             }
         }
     }
     
     override fun onCleared() {
         super.onCleared()
-        pusherClient?.unsubscribe("private-escalation-$escalationId")
+        disconnect()
     }
 }

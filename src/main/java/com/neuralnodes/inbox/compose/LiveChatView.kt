@@ -5,30 +5,32 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.neuralnodes.inbox.NeuralNodesInbox
 import com.neuralnodes.inbox.models.ChatMessage
+import com.neuralnodes.inbox.models.Message
 import com.neuralnodes.inbox.viewmodels.LiveChatViewModel
+import java.util.Date
 
 /**
- * Composable Live Chat View - Can be embedded anywhere
- * 
- * Usage:
- * ```
- * LiveChatView(
- *     escalationId = "escalation_123",
- *     sdk = NeuralNodesInbox.getInstance()
- * )
- * ```
+ * iOS-style Composable Live Chat View
+ * Matches iOS SDK design with rounded input bar and proper message bubbles
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,7 +64,13 @@ fun LiveChatView(
         // Optional Toolbar
         if (showToolbar) {
             TopAppBar(
-                title = { Text(title) },
+                title = { 
+                    Text(
+                        title,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold
+                    ) 
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.White,
                     titleContentColor = Color.Black
@@ -74,7 +82,8 @@ fun LiveChatView(
         Box(modifier = Modifier.weight(1f)) {
             if (isLoading && messages.isEmpty()) {
                 CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = Modifier.align(Alignment.Center),
+                    color = Color(0xFF4A6EE0)
                 )
             } else {
                 LazyColumn(
@@ -85,7 +94,17 @@ fun LiveChatView(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(messages) { message ->
+                    items(messages) { chatMessage ->
+                        // Convert ChatMessage to Message for MessageBubble
+                        val message = Message(
+                            id = chatMessage.id,
+                            conversationId = "",
+                            messageText = chatMessage.messageText,
+                            senderType = chatMessage.senderType,
+                            senderName = chatMessage.senderName,
+                            createdAt = chatMessage.createdAt,
+                            updatedAt = chatMessage.createdAt
+                        )
                         MessageBubble(message = message)
                     }
                     
@@ -101,7 +120,7 @@ fun LiveChatView(
         
         // Input Bar
         if (currentStatus != "closed" && currentStatus != "resolved") {
-            MessageInputBar(
+            IOSMessageInputBar(
                 text = messageText,
                 onTextChange = { viewModel.setMessageText(it) },
                 onSend = {
@@ -118,6 +137,7 @@ fun LiveChatView(
                     text = "This conversation has been closed",
                     modifier = Modifier.padding(16.dp),
                     fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
                     color = Color(0xFF6B7280)
                 )
             }
@@ -125,54 +145,9 @@ fun LiveChatView(
     }
 }
 
-@Composable
-private fun MessageBubble(message: ChatMessage) {
-    val isAgent = message.isFromAgent
-    
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = if (isAgent) Alignment.End else Alignment.Start
-    ) {
-        // Sender name for user messages
-        if (!isAgent) {
-            Text(
-                text = message.displaySenderName,
-                fontSize = 13.sp,
-                color = Color(0xFF9CA3AF),
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-        }
-        
-        // Message bubble
-        Surface(
-            shape = RoundedCornerShape(20.dp),
-            color = if (isAgent) Color(0xFF4A6EE0) else Color(0xFFF3F4F6),
-            shadowElevation = if (isAgent) 2.dp else 1.dp,
-            modifier = Modifier.widthIn(max = 280.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
-            ) {
-                Text(
-                    text = message.messageText,
-                    fontSize = 17.sp,
-                    color = if (isAgent) Color.White else Color.Black,
-                    lineHeight = 22.sp
-                )
-                
-                Text(
-                    text = formatTime(message.createdAt),
-                    fontSize = 13.sp,
-                    color = if (isAgent) Color(0xFFE0E7FF) else Color(0xFF6B7280),
-                    modifier = Modifier
-                        .align(if (isAgent) Alignment.End else Alignment.Start)
-                        .padding(top = 4.dp)
-                )
-            }
-        }
-    }
-}
-
+/**
+ * iOS-style Typing Indicator
+ */
 @Composable
 private fun TypingIndicator() {
     Row(
@@ -181,23 +156,29 @@ private fun TypingIndicator() {
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         repeat(3) {
-            Surface(
-                shape = RoundedCornerShape(50),
-                color = Color.Gray,
-                modifier = Modifier.size(6.dp)
-            ) {}
+            Box(
+                modifier = Modifier
+                    .size(6.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFF6B7280))
+            )
         }
         Text(
             text = "Customer is typing...",
             fontSize = 12.sp,
-            color = Color.Gray,
+            fontWeight = FontWeight.Medium,
+            color = Color(0xFF6B7280),
             modifier = Modifier.padding(start = 4.dp)
         )
     }
 }
 
+/**
+ * iOS-style Message Input Bar
+ * Matches iOS SDK with rounded input (20dp) and circular send button
+ */
 @Composable
-private fun MessageInputBar(
+private fun IOSMessageInputBar(
     text: String,
     onTextChange: (String) -> Unit,
     onSend: () -> Unit
@@ -214,34 +195,67 @@ private fun MessageInputBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            OutlinedTextField(
-                value = text,
-                onValueChange = onTextChange,
-                modifier = Modifier.weight(1f),
-                placeholder = { Text("Type a message...") },
-                shape = RoundedCornerShape(18.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFFD1D5DB),
-                    unfocusedBorderColor = Color(0xFFD1D5DB)
-                )
-            )
+            // Input Field with iOS-style rounded background
+            Row(
+                modifier = Modifier
+                    .weight(1f)
+                    .background(
+                        color = Color(0xFFF3F4F6),
+                        shape = RoundedCornerShape(20.dp) // iOS input radius
+                    )
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    if (text.isEmpty()) {
+                        Text(
+                            text = "Type a message...",
+                            style = TextStyle(
+                                fontSize = 17.sp,
+                                color = Color(0xFF6B7280),
+                                fontWeight = FontWeight.Normal
+                            )
+                        )
+                    }
+                    
+                    BasicTextField(
+                        value = text,
+                        onValueChange = onTextChange,
+                        modifier = Modifier.fillMaxWidth(),
+                        textStyle = TextStyle(
+                            fontSize = 17.sp,
+                            color = Color.Black,
+                            fontWeight = FontWeight.Normal
+                        ),
+                        cursorBrush = SolidColor(Color(0xFF4A6EE0)),
+                        maxLines = 4
+                    )
+                }
+            }
             
+            // Circular Send Button
             IconButton(
                 onClick = onSend,
-                enabled = text.isNotBlank()
+                enabled = text.isNotBlank(),
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(
+                        if (text.isNotBlank()) Color(0xFF4A6EE0) else Color(0xFFE5E7EB)
+                    )
             ) {
-                Text(
-                    text = "➤",
-                    fontSize = 24.sp,
-                    color = if (text.isNotBlank()) Color(0xFF4A6EE0) else Color.Gray
+                Icon(
+                    imageVector = Icons.Default.Send,
+                    contentDescription = "Send",
+                    tint = if (text.isNotBlank()) Color.White else Color(0xFF9CA3AF),
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }
     }
-}
-
-private fun formatTime(date: java.util.Date): String {
-    return java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(date)
 }
 
 // ViewModel Factory

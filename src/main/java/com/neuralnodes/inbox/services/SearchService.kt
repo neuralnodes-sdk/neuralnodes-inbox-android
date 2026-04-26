@@ -1,12 +1,13 @@
 package com.neuralnodes.inbox.services
 
+import com.neuralnodes.inbox.models.*
 import com.neuralnodes.inbox.network.APIClient
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 /**
  * Search service with debouncing for efficient API calls
- * Matches iOS SearchService implementation
+ * Exact match to iOS SearchService implementation
  */
 class SearchService(
     private val apiClient: APIClient,
@@ -220,36 +221,3 @@ class SearchService(
         scope.cancel()
     }
 }
-
-// MARK: - Data Classes
-
-data class ConversationSearchFilters(
-    val query: String,
-    val channel: String? = null,
-    val status: String? = null,
-    val limit: Int = 20,
-    val offset: Int = 0
-)
-
-data class MessageSearchFilters(
-    val query: String,
-    val conversationId: String? = null,
-    val limit: Int = 50,
-    val offset: Int = 0
-)
-
-data class SearchConversationsResponse(
-    val conversations: List<Any>, // Replace with actual Conversation type
-    val total: Int,
-    val hasMore: Boolean
-)
-
-data class SearchMessagesResponse(
-    val messages: List<Any>, // Replace with actual Message type
-    val total: Int,
-    val hasMore: Boolean
-)
-
-data class SearchSuggestionsResponse(
-    val suggestions: List<String>
-)

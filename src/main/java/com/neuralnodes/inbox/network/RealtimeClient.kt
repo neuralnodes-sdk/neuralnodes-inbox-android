@@ -139,11 +139,49 @@ class RealtimeClient {
     
     /**
      * Subscribe to inbox updates
+     * Exact match to iOS SDK
      */
-    fun subscribeToInbox(onUpdate: () -> Unit) {
-        val channel = ably?.channels?.get("inbox-updates")
-        channel?.subscribe { onUpdate() }
-        println("✅ Subscribed to inbox updates")
+    fun subscribeToInbox(clientId: String, onUpdate: () -> Unit) {
+        if (ably == null) {
+            println("⚠️ Ably not connected for inbox subscription")
+            return
+        }
+        
+        val channelName = "inbox-updates-$clientId"
+        val channel = ably?.channels?.get(channelName)
+        
+        println("📡 Subscribing to Ably inbox channel: $channelName")
+        
+        channel?.subscribe { message ->
+            println("📨 [INBOX UPDATE] Received Ably message on $channelName")
+            println("   Event name: ${message.name ?: "nil"}")
+            println("   Timestamp: ${java.util.Date()}")
+            message.data?.let {
+                println("   Data: $it")
+            }
+            
+            // Trigger callback on main thread
+            onUpdate()
+        }
+        
+        subscribedChannels["inbox-updates"] = channel!!
+        println("✅ Subscribed to inbox updates: $channelName")
+    }
+    
+    /**
+     * Unsubscribe from inbox updates
+     * Exact match to iOS SDK
+     */
+    fun unsubscribeFromInbox() {
+        subscribedChannels.remove("inbox-updates")?.let { channel ->
+            try {
+                println("🔕 Unsubscribing from inbox updates")
+                channel.unsubscribe()
+                println("✅ Unsubscribed from inbox updates")
+            } catch (e: Exception) {
+                println("⚠️ Error unsubscribing from inbox: ${e.message}")
+            }
+        }
     }
     
     /**

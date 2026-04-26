@@ -134,68 +134,105 @@ class PusherClient(
     }
     
     /**
-     * Subscribe to escalation updates with proper cleanup
+     * Subscribe to escalation updates - Simple signature matching iOS SDK
      */
     fun subscribeToEscalation(
         escalationId: String,
-        onNewMessage: ((ChatMessage) -> Unit)? = null,
-        onTypingIndicator: ((TypingIndicator) -> Unit)? = null,
-        onStatusChanged: ((Map<String, Any>) -> Unit)? = null
-    ): Flow<String> = callbackFlow {
+        onMessage: (ChatMessage) -> Unit,
+        onTyping: (Boolean) -> Unit
+    ) {
         val channelName = "private-escalation-$escalationId"
         
         try {
+            println("📡 [PUSHER] Subscribing to channel: $channelName")
             val channel = pusher?.subscribePrivate(channelName) ?: run {
                 println("⚠️ Pusher not initialized")
-                awaitClose {}
-                return@callbackFlow
+                return
             }
             
             subscribedChannels[channelName] = channel
             
-            // New message
+            // Subscribe to new messages
             channel.bind("new-message") { event ->
+                println("📨 [PUSHER] Received new-message event on $channelName")
+                println("   Event data: ${event.data ?: "nil"}")
+                
                 try {
+                    println("📦 [PUSHER] Parsing message JSON...")
                     val message = gson.fromJson(event.data, ChatMessage::class.java)
-                    onNewMessage?.invoke(message)
-                    trySend("new-message")
+                    println("✅ [PUSHER] Message decoded successfully: ${message.messageText}")
+                    println("🔔 [PUSHER] Calling onMessage callback...")
+                    onMessage(message)
                 } catch (e: Exception) {
-                    println("⚠️ Failed to parse message: ${e.message}")
+                    println("❌ [PUSHER] Failed to decode message: ${e.message}")
                 }
             }
             
-            // Typing indicator
-            channel.bind("typing-indicator") { event ->
+            // Subscribe to typing indicators
+            channel.bind("typing") { event ->
                 try {
-                    val indicator = gson.fromJson(event.data, TypingIndicator::class.java)
-                    // Only show typing from users, not agents
-                    if (indicator.senderType != "agent") {
-                        onTypingIndicator?.invoke(indicator)
-                    }
+                    val json = gson.fromJson(event.data, Map::class.java) as Map<String, Any>
+                    val isTyping = json["is_typing"] as? Boolean ?: false
+                    onTyping(isTyping)
                 } catch (e: Exception) {
                     println("⚠️ Failed to parse typing indicator: ${e.message}")
                 }
             }
             
-            // Status changed
-            channel.bind("status-changed") { event ->
-                try {
-                    val json = gson.fromJson(event.data, Map::class.java) as Map<String, Any>
-                    onStatusChanged?.invoke(json)
-                    trySend("status-changed")
-                } catch (e: Exception) {
-                    println("⚠️ Failed to parse status change: ${e.message}")
-                }
-            }
-            
             println("✅ Subscribed to escalation: $channelName")
-            
-            awaitClose {
-                unsubscribe(channelName)
-            }
         } catch (e: Exception) {
             println("❌ Failed to subscribe to escalation: ${e.message}")
-            awaitClose {}
+        }
+    }
+    
+    /**
+     * Subscribe to escalation list updates
+     * Exact match to iOS SDK
+     */
+    fun subscribeToEscalationList(clientId: String, onUpdate: () -> Unit) {
+        val channelName = "private-client-$clientId"
+        
+        try {
+            println("📡 [PUSHER] Subscribing to escalation list channel: $channelName")
+            val channel = pusher?.subscribePrivate(channelName) ?: run {
+                println("⚠️ Pusher not initialized")
+                return
+            }
+            
+            subscribedChannels["escalation-list"] = channel
+            
+            channel.bind("new-escalation") { event ->
+                println("🔔 [PUSHER] Received new-escalation event")
+                onUpdate()
+            }
+            
+            channel.bind("escalation-update") { event ->
+                println("🔔 [PUSHER] Received escalation-update event")
+                onUpdate()
+            }
+            
+            println("✅ [PUSHER] Subscribed to escalation list updates: $channelName")
+        } catch (e: Exception) {
+            println("❌ Failed to subscribe to escalation list: ${e.message}")
+        }
+    }
+    
+    /**
+     * Unsubscribe from escalation - Takes escalationId
+     * Exact match to iOS SDK
+     */
+    fun unsubscribe(escalationId: String) {
+        val channelName = "private-escalation-$escalationId"
+        subscribedChannels.remove(channelName)?.let { channel ->
+            try {
+                println("🔕 [PUSHER] Unsubscribing from channel: $channelName")
+                channel.unbind("new-message", null)
+                channel.unbind("typing", null)
+                pusher?.unsubscribe(channelName)
+                println("✅ Unsubscribed from: $channelName")
+            } catch (e: Exception) {
+                println("⚠️ Error unsubscribing from $channelName: ${e.message}")
+            }
         }
     }
     
