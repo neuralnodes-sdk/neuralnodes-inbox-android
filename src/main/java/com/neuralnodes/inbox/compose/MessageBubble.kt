@@ -13,6 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.neuralnodes.inbox.models.Message
+import com.neuralnodes.inbox.models.ChatMessage
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -25,9 +26,46 @@ fun MessageBubble(
     message: Message,
     modifier: Modifier = Modifier
 ) {
-    val isAgent = message.senderType == "agent"
-    val isUser = message.senderType == "user"
-    val isSystem = message.senderType == "system"
+    MessageBubbleContent(
+        messageText = message.messageText,
+        senderType = message.senderType,
+        senderName = message.senderName,
+        createdAt = message.createdAt,
+        modifier = modifier
+    )
+}
+
+/**
+ * Overload for ChatMessage
+ */
+@Composable
+fun MessageBubble(
+    message: ChatMessage,
+    modifier: Modifier = Modifier
+) {
+    MessageBubbleContent(
+        messageText = message.messageText,
+        senderType = message.senderType,
+        senderName = message.senderName,
+        createdAt = message.createdAt,
+        modifier = modifier
+    )
+}
+
+/**
+ * Internal composable for rendering message bubble content
+ */
+@Composable
+private fun MessageBubbleContent(
+    messageText: String,
+    senderType: String,
+    senderName: String?,
+    createdAt: Date,
+    modifier: Modifier = Modifier
+) {
+    val isAgent = senderType == "agent"
+    val isUser = senderType == "user"
+    val isSystem = senderType == "system"
     
     if (isSystem) {
         // System message - centered
@@ -42,7 +80,7 @@ fun MessageBubble(
                 color = Color(0xFFF3F4F6).copy(alpha = 0.8f)
             ) {
                 Text(
-                    text = message.messageText,
+                    text = messageText,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color(0xFF6B7280),
@@ -53,7 +91,7 @@ fun MessageBubble(
             Spacer(modifier = Modifier.height(4.dp))
             
             Text(
-                text = formatTime(message.createdAt),
+                text = formatTime(createdAt),
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color(0xFF6B7280).copy(alpha = 0.8f)
@@ -78,7 +116,7 @@ fun MessageBubble(
                 // Sender Name (for user messages)
                 if (isUser) {
                     Text(
-                        text = message.senderName ?: "User",
+                        text = senderName ?: "User",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color(0xFF6B7280),
@@ -98,7 +136,7 @@ fun MessageBubble(
                     )
                 ) {
                     Text(
-                        text = message.messageText,
+                        text = messageText,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Normal,
                         color = if (isAgent) Color.White else Color.Black,
@@ -108,7 +146,7 @@ fun MessageBubble(
                 
                 // Timestamp
                 Text(
-                    text = formatTime(message.createdAt),
+                    text = formatTime(createdAt),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color(0xFF6B7280).copy(alpha = 0.8f),

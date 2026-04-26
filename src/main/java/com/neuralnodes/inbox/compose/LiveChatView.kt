@@ -46,7 +46,6 @@ fun LiveChatView(
     )
     
     val messages by viewModel.messages.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
     val isTyping by viewModel.isTyping.collectAsState()
     val messageText by viewModel.messageText.collectAsState()
     val currentStatus by viewModel.currentStatus.collectAsState()
@@ -80,10 +79,12 @@ fun LiveChatView(
         
         // Messages List
         Box(modifier = Modifier.weight(1f)) {
-            if (isLoading && messages.isEmpty()) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center),
-                    color = Color(0xFF4A6EE0)
+            if (messages.isEmpty()) {
+                // Show empty state
+                EmptyStateView(
+                    icon = "💬",
+                    title = "No Messages",
+                    message = "Start the conversation"
                 )
             } else {
                 LazyColumn(
@@ -95,17 +96,7 @@ fun LiveChatView(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(messages) { chatMessage ->
-                        // Convert ChatMessage to Message for MessageBubble
-                        val message = Message(
-                            id = chatMessage.id,
-                            conversationId = "",
-                            messageText = chatMessage.messageText,
-                            senderType = chatMessage.senderType,
-                            senderName = chatMessage.senderName,
-                            createdAt = chatMessage.createdAt,
-                            updatedAt = chatMessage.createdAt
-                        )
-                        MessageBubble(message = message)
+                        MessageBubble(message = chatMessage)
                     }
                     
                     // Typing indicator

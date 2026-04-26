@@ -68,7 +68,7 @@ fun InboxTabView(
                 NavigationBarItem(
                     icon = { 
                         Icon(
-                            imageVector = Icons.Default.Message,
+                            imageVector = Icons.Default.Send,
                             contentDescription = "Live Chat",
                             modifier = Modifier.size(24.dp)
                         )

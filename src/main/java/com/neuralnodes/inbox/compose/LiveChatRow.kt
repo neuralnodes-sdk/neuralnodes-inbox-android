@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.neuralnodes.inbox.models.Escalation
+import com.neuralnodes.inbox.models.EscalationStatus
 import com.neuralnodes.inbox.extensions.timeAgo
 
 /**
@@ -106,7 +107,7 @@ fun LiveChatRow(
                                 .background(getStatusColor(escalation.status))
                         )
                         Text(
-                            text = escalation.status.replaceFirstChar { 
+                            text = escalation.status.name.lowercase().replaceFirstChar { 
                                 if (it.isLowerCase()) it.titlecase() else it.toString() 
                             },
                             fontSize = 11.sp,
@@ -155,12 +156,13 @@ private fun getInitials(name: String): String {
 }
 
 /**
- * Get status color
+ * Get status color for EscalationStatus enum
  */
-private fun getStatusColor(status: String): Color {
-    return when (status.lowercase()) {
-        "active" -> Color(0xFF10B981)
-        "waiting" -> Color(0xFFF59E0B)
-        else -> Color(0xFF6B7280)
+private fun getStatusColor(status: EscalationStatus): Color {
+    return when (status) {
+        EscalationStatus.ACTIVE -> Color(0xFF10B981)
+        EscalationStatus.PENDING -> Color(0xFFF59E0B)
+        EscalationStatus.RESOLVED -> Color(0xFF6B7280)
+        EscalationStatus.CLOSED -> Color(0xFFEF4444)
     }
 }

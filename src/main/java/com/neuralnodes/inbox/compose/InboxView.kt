@@ -355,11 +355,11 @@ private fun getChannelColor(channel: String): Color {
  */
 private fun getChannelIcon(channel: String): ImageVector {
     return when (channel.lowercase()) {
-        "webchat" -> Icons.Default.Message
+        "webchat" -> Icons.Default.Send
         "whatsapp" -> Icons.Default.Phone
         "telegram" -> Icons.Default.Send
         "email" -> Icons.Default.Email
-        else -> Icons.Default.Message
+        else -> Icons.Default.Send
     }
 }
 

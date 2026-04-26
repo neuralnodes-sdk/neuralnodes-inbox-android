@@ -111,7 +111,7 @@ class LiveChatViewModel(
                 // Load escalation details to get current status
                 NeuralNodesLogger.info("[LIVE CHAT VM] Fetching escalation details...")
                 val escalation = liveChatClient.getEscalation(escalationId)
-                _currentStatus.value = escalation.status.value
+                _currentStatus.value = escalation.status.name.lowercase()
                 NeuralNodesLogger.info("[LIVE CHAT VM] Escalation status: ${escalation.status}")
                 
                 NeuralNodesLogger.info("[LIVE CHAT VM] Fetching messages...")
