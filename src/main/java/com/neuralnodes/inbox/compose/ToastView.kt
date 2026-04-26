@@ -38,7 +38,7 @@ enum class ToastStyle {
     val icon: ImageVector
         get() = when (this) {
             SUCCESS -> Icons.Default.CheckCircle
-            ERROR -> Icons.Default.Cancel
+            ERROR -> Icons.Default.Close
             INFO -> Icons.Default.Info
             WARNING -> Icons.Default.Warning
         }

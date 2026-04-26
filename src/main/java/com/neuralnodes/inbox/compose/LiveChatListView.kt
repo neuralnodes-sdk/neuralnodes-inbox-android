@@ -88,7 +88,7 @@ fun LiveChatListView(
                                 LiveChatRow(escalation = escalation)
                             }
                             
-                            HorizontalDivider(
+                            Divider(
                                 modifier = Modifier.padding(start = 62.dp),
                                 color = Color(0xFFE5E7EB),
                                 thickness = 0.5.dp

@@ -112,7 +112,7 @@ fun MessageBubble(
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color(0xFF6B7280).copy(alpha = 0.8f),
-                    modifier = Modifier.padding(horizontal = 16.dp, top = 2.dp)
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 2.dp)
                 )
             }
             

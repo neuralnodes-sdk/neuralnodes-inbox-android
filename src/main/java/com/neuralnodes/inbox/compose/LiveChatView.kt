@@ -124,7 +124,7 @@ fun LiveChatView(
                 text = messageText,
                 onTextChange = { viewModel.setMessageText(it) },
                 onSend = {
-                    viewModel.sendMessage(messageText)
+                    viewModel.sendMessage()
                 }
             )
         } else {
@@ -170,91 +170,6 @@ private fun TypingIndicator() {
             color = Color(0xFF6B7280),
             modifier = Modifier.padding(start = 4.dp)
         )
-    }
-}
-
-/**
- * iOS-style Message Input Bar
- * Matches iOS SDK with rounded input (20dp) and circular send button
- */
-@Composable
-private fun IOSMessageInputBar(
-    text: String,
-    onTextChange: (String) -> Unit,
-    onSend: () -> Unit
-) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = Color.White,
-        shadowElevation = 8.dp
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            // Input Field with iOS-style rounded background
-            Row(
-                modifier = Modifier
-                    .weight(1f)
-                    .background(
-                        color = Color(0xFFF3F4F6),
-                        shape = RoundedCornerShape(20.dp) // iOS input radius
-                    )
-                    .padding(horizontal = 16.dp, vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier.weight(1f),
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    if (text.isEmpty()) {
-                        Text(
-                            text = "Type a message...",
-                            style = TextStyle(
-                                fontSize = 17.sp,
-                                color = Color(0xFF6B7280),
-                                fontWeight = FontWeight.Normal
-                            )
-                        )
-                    }
-                    
-                    BasicTextField(
-                        value = text,
-                        onValueChange = onTextChange,
-                        modifier = Modifier.fillMaxWidth(),
-                        textStyle = TextStyle(
-                            fontSize = 17.sp,
-                            color = Color.Black,
-                            fontWeight = FontWeight.Normal
-                        ),
-                        cursorBrush = SolidColor(Color(0xFF4A6EE0)),
-                        maxLines = 4
-                    )
-                }
-            }
-            
-            // Circular Send Button
-            IconButton(
-                onClick = onSend,
-                enabled = text.isNotBlank(),
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(
-                        if (text.isNotBlank()) Color(0xFF4A6EE0) else Color(0xFFE5E7EB)
-                    )
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Send,
-                    contentDescription = "Send",
-                    tint = if (text.isNotBlank()) Color.White else Color(0xFF9CA3AF),
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-        }
     }
 }
 

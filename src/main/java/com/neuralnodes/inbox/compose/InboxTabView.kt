@@ -68,7 +68,7 @@ fun InboxTabView(
                 NavigationBarItem(
                     icon = { 
                         Icon(
-                            imageVector = Icons.Default.Chat,
+                            imageVector = Icons.Default.Message,
                             contentDescription = "Live Chat",
                             modifier = Modifier.size(24.dp)
                         )
@@ -188,13 +188,13 @@ private fun SettingsView(sdk: NeuralNodesInbox) {
             // SDK Version
             SettingsItem(
                 title = "SDK Version",
-                value = com.neuralnodes.inbox.SDKVersion.VERSION
+                value = com.neuralnodes.inbox.SDKVersion.version
             )
             
             // Full Version
             SettingsItem(
                 title = "Full Version",
-                value = com.neuralnodes.inbox.SDKVersion.FULL_VERSION
+                value = com.neuralnodes.inbox.SDKVersion.fullVersion
             )
             
             // Dark Mode
@@ -234,7 +234,7 @@ private fun SettingsItem(title: String, value: String) {
                 color = Color(0xFF6B7280)
             )
         }
-        HorizontalDivider(
+        Divider(
             color = Color(0xFFE5E7EB),
             thickness = 0.5.dp
         )

@@ -106,7 +106,9 @@ fun LiveChatRow(
                                 .background(getStatusColor(escalation.status))
                         )
                         Text(
-                            text = escalation.status.replaceFirstChar { it.uppercase() },
+                            text = escalation.status.replaceFirstChar { 
+                                if (it.isLowerCase()) it.titlecase() else it.toString() 
+                            },
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Medium,
                             color = getStatusColor(escalation.status)

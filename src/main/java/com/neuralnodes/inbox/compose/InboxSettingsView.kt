@@ -44,13 +44,13 @@ fun InboxSettingsView(
             // SDK Version
             SettingsItem(
                 title = "SDK Version",
-                value = SDKVersion.VERSION
+                value = SDKVersion.version
             )
             
             // Full Version
             SettingsItem(
                 title = "Full Version",
-                value = SDKVersion.FULL_VERSION
+                value = SDKVersion.fullVersion
             )
             
             // Dark Mode
@@ -160,7 +160,7 @@ private fun SettingsItem(
                 color = Color(0xFF6B7280)
             )
         }
-        HorizontalDivider(
+        Divider(
             color = Color(0xFFE5E7EB),
             thickness = 0.5.dp
         )

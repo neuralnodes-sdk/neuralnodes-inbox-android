@@ -125,9 +125,16 @@ class InboxActivity : AppCompatActivity() {
     }
     
     private fun subscribeToUpdates() {
-        realtimeClient.subscribeToInbox {
-            runOnUiThread {
-                loadConversations()
+        lifecycleScope.launch {
+            try {
+                val clientInfo = apiClient.getClientInfo()
+                realtimeClient.subscribeToInbox(clientInfo.id) {
+                    runOnUiThread {
+                        loadConversations()
+                    }
+                }
+            } catch (e: Exception) {
+                println("⚠️ Failed to subscribe to updates: ${e.message}")
             }
         }
     }

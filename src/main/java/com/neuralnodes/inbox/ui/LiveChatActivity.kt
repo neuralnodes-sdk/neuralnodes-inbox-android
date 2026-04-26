@@ -416,7 +416,7 @@ class LiveChatActivity : AppCompatActivity() {
             try {
                 pusherClient.subscribeToEscalation(
                     escalationId,
-                    onNewMessage = { message ->
+                    onMessage = { message ->
                         println("📨 New message received: ${message.id} from ${message.senderType}")
                         
                         runOnUiThread {
@@ -444,10 +444,10 @@ class LiveChatActivity : AppCompatActivity() {
                             }
                         }
                     },
-                    onTypingIndicator = { indicator ->
+                    onTyping = { isTyping ->
                         runOnUiThread {
-                            if (indicator.isTyping) {
-                                binding.typingIndicator.text = "${indicator.senderName} is typing..."
+                            if (isTyping) {
+                                binding.typingIndicator.text = "Customer is typing..."
                                 binding.typingIndicator.visibility = View.VISIBLE
                                 
                                 // Hide after 3 seconds
@@ -458,17 +458,8 @@ class LiveChatActivity : AppCompatActivity() {
                                 binding.typingIndicator.visibility = View.GONE
                             }
                         }
-                    },
-                    onStatusChanged = { data ->
-                        println("📊 Status changed: $data")
-                        runOnUiThread {
-                            // Refresh escalations list
-                            loadEscalations()
-                        }
                     }
-                ).collect { event ->
-                    println("🔔 Escalation event: $event")
-                }
+                )
             } catch (e: Exception) {
                 println("❌ Failed to subscribe to escalation: ${e.message}")
                 e.printStackTrace()

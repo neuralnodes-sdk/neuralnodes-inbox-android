@@ -14,6 +14,7 @@ import com.neuralnodes.inbox.NeuralNodesInbox
 import com.neuralnodes.inbox.R
 import com.neuralnodes.inbox.databinding.FragmentInboxBinding
 import com.neuralnodes.inbox.models.Conversation
+import com.neuralnodes.inbox.models.ConversationStatus
 import com.neuralnodes.inbox.ui.ChatActivity
 import com.neuralnodes.inbox.ui.ConversationAdapter
 import com.neuralnodes.inbox.viewmodels.InboxViewModel
@@ -96,10 +97,10 @@ class InboxFragment : Fragment() {
     
     private fun setupFilterChips() {
         val filters = listOf(
-            "All" to null,
-            "Active" to "active",
-            "Pending" to "pending",
-            "Resolved" to "resolved"
+            "All" to ConversationStatus.ALL,
+            "Active" to ConversationStatus.ACTIVE,
+            "Pending" to ConversationStatus.PENDING,
+            "Resolved" to ConversationStatus.RESOLVED
         )
         
         filters.forEach { (label, status) ->
