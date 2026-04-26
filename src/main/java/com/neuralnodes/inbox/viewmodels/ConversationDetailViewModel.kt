@@ -52,11 +52,11 @@ class ConversationDetailViewModel(
     
     fun startListening() {
         val realtimeClient = sdk.getRealtimeClient()
-        realtimeClient.subscribeToConversation(conversationId) { message ->
-            viewModelScope.launch {
+        viewModelScope.launch {
+            realtimeClient.subscribeToConversation(conversationId).collect { message ->
                 // Check if message already exists (avoid duplicates)
                 if (!_messages.value.any { it.id == message.id }) {
-                    _messages.value = _messages.value + message
+                    _messages.value = _messages.value + listOf(message)
                     _scrollToMessageId.value = message.id
                 }
             }
