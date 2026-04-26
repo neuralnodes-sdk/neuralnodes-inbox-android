@@ -111,6 +111,18 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
 
+// Extract version from SDKVersion.kt
+def getVersionFromSDKVersion() {
+    def sdkVersionFile = file('src/main/java/com/neuralnodes/inbox/SDKVersion.kt')
+    if (sdkVersionFile.exists()) {
+        def versionLine = sdkVersionFile.text.find(/version\s*=\s*"([^"]+)"/)
+        if (versionLine) {
+            return (versionLine =~ /version\s*=\s*"([^"]+)"/)[0][1]
+        }
+    }
+    return '2.2.0' // Fallback version
+}
+
 afterEvaluate {
     publishing {
         publications {
@@ -118,7 +130,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.neuralnodes.inbox'
                 artifactId = 'neuralnodes-inbox-android'
-                version = com.neuralnodes.inbox.SDKVersion.version
+                version = getVersionFromSDKVersion()
                 
                 pom {
                     name = 'NeuralNodes Inbox SDK for Android'
