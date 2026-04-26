@@ -28,25 +28,51 @@ A powerful, flexible Android SDK for integrating customer support inbox function
 
 ### Gradle (Kotlin DSL)
 
+Add JitPack repository to your `settings.gradle.kts`:
+
+```kotlin
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url = uri("https://jitpack.io") }
+    }
+}
+```
+
 Add the SDK to your app's `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("space.neuralnodes:inbox-android:2.2.0")
+    implementation("com.github.neuralnodes-sdk:neuralnodes-inbox-android:2.2.8")
 }
 ```
 
 ### Gradle (Groovy)
 
+Add JitPack repository to your `settings.gradle`:
+
+```gradle
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+}
+```
+
 Add the SDK to your app's `build.gradle`:
 
 ```gradle
 dependencies {
-    implementation 'space.neuralnodes:inbox-android:2.2.0'
+    implementation 'com.github.neuralnodes-sdk:neuralnodes-inbox-android:2.2.8'
 }
 ```
 
-That's it! Maven Central is included by default in all Android projects.
+That's it! No authentication needed.
 
 ### Alternative: Direct AAR Download
 

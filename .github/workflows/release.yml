@@ -128,17 +128,18 @@ jobs:
           echo "✅ Build completed successfully"
           echo "📦 Android SDK is ready for distribution"
       
-      - name: Publish to Maven Central Staging
+      - name: Trigger JitPack Build
         if: steps.version_changed.outputs.changed == 'true' && steps.check_tag.outputs.exists == 'false'
         run: |
-          echo "📦 Publishing to Maven Central Staging..."
-          echo "Using credentials: $OSSRH_USERNAME"
-          ./gradlew publishReleasePublicationToOSSRHRepository --no-daemon --stacktrace
-        env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
-          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+          VERSION="${{ steps.get_version.outputs.version }}"
+          echo "🚀 Triggering JitPack build for version $VERSION..."
+          
+          # Trigger JitPack build immediately
+          curl -X POST "https://jitpack.io/api/builds/com.github.neuralnodes-sdk/neuralnodes-inbox-android/$VERSION"
+          
+          echo "✅ JitPack build triggered!"
+          echo "📦 Package will be available at:"
+          echo "   implementation 'com.github.neuralnodes-sdk:neuralnodes-inbox-android:$VERSION'"
       
       - name: Create Git tag
         if: steps.version_changed.outputs.changed == 'true' && steps.check_tag.outputs.exists == 'false'
@@ -214,7 +215,7 @@ jobs:
           echo "Add to your build.gradle:"
           echo ""
           echo "dependencies {"
-          echo "    implementation 'space.neuralnodes:inbox-android:${{ steps.get_version.outputs.version }}'"
+          echo "    implementation 'com.github.neuralnodes-sdk:neuralnodes-inbox-android:${{ steps.get_version.outputs.version }}'"
           echo "}"
           echo ""
           echo "Or download AAR directly from:"
@@ -267,14 +268,14 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Installation:*\n```dependencies {\n    implementation 'space.neuralnodes:inbox-android:${{ steps.get_version.outputs.version }}'\n}```"
+                    "text": "*Installation:*\n```dependencies {\n    implementation 'com.github.neuralnodes-sdk:neuralnodes-inbox-android:${{ steps.get_version.outputs.version }}'\n}```"
                   }
                 },
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Published to:*\n• Maven Central\n• GitHub Releases (AAR download)"
+                    "text": "*Published to:*\n• JitPack (https://jitpack.io)\n• GitHub Releases (AAR download)"
                   }
                 },
                 {

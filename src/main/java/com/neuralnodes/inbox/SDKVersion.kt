@@ -7,7 +7,7 @@ import android.os.Build
  * Matches iOS SDKVersion implementation
  */
 object SDKVersion {
-    const val version = "2.2.8"
+    const val version = "2.2.9"
     
     const val name = "NeuralNodesInbox-Android"
     
