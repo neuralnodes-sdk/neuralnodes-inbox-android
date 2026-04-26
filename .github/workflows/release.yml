@@ -131,8 +131,8 @@ jobs:
       - name: Publish to Maven Central
         if: steps.version_changed.outputs.changed == 'true' && steps.check_tag.outputs.exists == 'false'
         run: |
-          echo "📦 Publishing to Maven Central..."
-          ./gradlew publishReleasePublicationToOSSRHRepository --no-daemon
+          echo "📦 Publishing to Maven Central (Staging)..."
+          ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --no-daemon
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
