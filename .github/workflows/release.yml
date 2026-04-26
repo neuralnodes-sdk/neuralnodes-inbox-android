@@ -76,6 +76,11 @@ jobs:
           java-version: '17'
           cache: 'gradle'
       
+      - name: Configure Git
+        run: |
+          git config --global user.email "neural.nodes.ai@gmail.com"
+          git config --global user.name "Neural Nodes"
+      
       - name: Get version from SDKVersion.kt
         id: get_version
         run: |
