@@ -128,14 +128,16 @@ jobs:
           echo "✅ Build completed successfully"
           echo "📦 Android SDK is ready for distribution"
       
-      - name: Publish to GitHub Packages
+      - name: Publish to Maven Central
         if: steps.version_changed.outputs.changed == 'true' && steps.check_tag.outputs.exists == 'false'
         run: |
-          echo "📦 Publishing to GitHub Packages..."
-          ./gradlew publish --no-daemon
+          echo "📦 Publishing to Maven Central..."
+          ./gradlew publishReleasePublicationToOSSRHRepository --no-daemon
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTOR: ${{ github.actor }}
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
       
       - name: Create Git tag
         if: steps.version_changed.outputs.changed == 'true' && steps.check_tag.outputs.exists == 'false'
@@ -211,7 +213,7 @@ jobs:
           echo "Add to your build.gradle:"
           echo ""
           echo "dependencies {"
-          echo "    implementation 'com.neuralnodes.inbox:neuralnodes-inbox-android:${{ steps.get_version.outputs.version }}'"
+          echo "    implementation 'space.neuralnodes:inbox-android:${{ steps.get_version.outputs.version }}'"
           echo "}"
           echo ""
           echo "Or download AAR directly from:"
@@ -264,14 +266,14 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Installation:*\n```dependencies {\n    implementation 'com.neuralnodes.inbox:neuralnodes-inbox-android:${{ steps.get_version.outputs.version }}'\n}```"
+                    "text": "*Installation:*\n```dependencies {\n    implementation 'space.neuralnodes:inbox-android:${{ steps.get_version.outputs.version }}'\n}```"
                   }
                 },
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Published to:*\n• GitHub Packages\n• GitHub Releases (AAR download)"
+                    "text": "*Published to:*\n• Maven Central\n• GitHub Releases (AAR download)"
                   }
                 },
                 {

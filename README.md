@@ -26,93 +26,31 @@ A powerful, flexible Android SDK for integrating customer support inbox function
 
 ## Installation
 
-### Prerequisites
-
-You'll need a GitHub Personal Access Token (PAT) to access GitHub Packages:
-
-1. Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
-2. Generate new token with `read:packages` scope
-3. Save the token securely
-
 ### Gradle (Kotlin DSL)
-
-Add GitHub Packages repository to your `settings.gradle.kts`:
-
-```kotlin
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-        
-        // GitHub Packages
-        maven {
-            url = uri("https://maven.pkg.github.com/neuralnodes-sdk/neuralnodes-inbox-android")
-            credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
-            }
-        }
-    }
-}
-```
-
-Add your credentials to `~/.gradle/gradle.properties`:
-
-```properties
-gpr.user=YOUR_GITHUB_USERNAME
-gpr.key=YOUR_GITHUB_TOKEN
-```
 
 Add the SDK to your app's `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("com.neuralnodes.inbox:neuralnodes-inbox-android:2.2.0")
+    implementation("space.neuralnodes:inbox-android:2.2.0")
 }
 ```
 
 ### Gradle (Groovy)
 
-Add GitHub Packages repository to your `settings.gradle`:
-
-```gradle
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-        
-        // GitHub Packages
-        maven {
-            url = uri("https://maven.pkg.github.com/neuralnodes-sdk/neuralnodes-inbox-android")
-            credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
-                password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
-            }
-        }
-    }
-}
-```
-
-Add your credentials to `~/.gradle/gradle.properties`:
-
-```properties
-gpr.user=YOUR_GITHUB_USERNAME
-gpr.key=YOUR_GITHUB_TOKEN
-```
-
 Add the SDK to your app's `build.gradle`:
 
 ```gradle
 dependencies {
-    implementation 'com.neuralnodes.inbox:neuralnodes-inbox-android:2.2.0'
+    implementation 'space.neuralnodes:inbox-android:2.2.0'
 }
 ```
 
+That's it! Maven Central is included by default in all Android projects.
+
 ### Alternative: Direct AAR Download
 
-If you prefer not to use GitHub Packages, you can download the AAR directly:
+If you prefer not to use Maven Central, you can download the AAR directly:
 
 1. Go to [Releases](https://github.com/neuralnodes-sdk/neuralnodes-inbox-android/releases)
 2. Download `neuralnodes-inbox-android-{version}.aar`
@@ -820,11 +758,10 @@ override fun onPause() {
 **Problem:** Gradle sync fails or build errors
 
 **Solutions:**
-- Ensure GitHub Packages repository is added correctly
-- Check minimum SDK version is 24+
-- Verify your GitHub token has `read:packages` scope
+- Ensure minimum SDK version is 24+
 - Clean and rebuild: `./gradlew clean build`
 - Invalidate caches: File → Invalidate Caches / Restart
+- Check you're using JDK 17+
 
 ### Push Notifications Not Working
 
