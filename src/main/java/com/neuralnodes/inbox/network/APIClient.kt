@@ -29,6 +29,11 @@ class APIClient(private val apiKey: String, baseURL: String = "https://api.neura
             val request = chain.request().newBuilder()
                 .addHeader("X-API-Key", apiKey)
                 .addHeader("Content-Type", "application/json")
+                // SDK identification headers - matching iOS SDK
+                .addHeader("User-Agent", com.neuralnodes.inbox.SDKVersion.userAgent)
+                .addHeader("X-SDK-Version", com.neuralnodes.inbox.SDKVersion.version)
+                .addHeader("X-SDK-Platform", "Android")
+                .addHeader("X-Client-Type", "ANDROID")
                 .build()
             chain.proceed(request)
         }
