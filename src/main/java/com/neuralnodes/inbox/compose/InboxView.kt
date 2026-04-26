@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.neuralnodes.inbox.NeuralNodesInbox
 import com.neuralnodes.inbox.models.Conversation
+import com.neuralnodes.inbox.models.ConversationStatus
 import com.neuralnodes.inbox.viewmodels.InboxViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -76,8 +77,19 @@ fun InboxView(
         
         // Filter Chips - iOS style
         FilterChipsRow(
-            selectedStatus = viewModel.selectedStatus.collectAsState().value,
-            onStatusSelected = { viewModel.setStatusFilter(it) },
+            selectedStatus = viewModel.selectedStatus.collectAsState().value.value,
+            onStatusSelected = { status ->
+                // Update filter by setting the status
+                viewModel.setStatusFilter(
+                    when (status) {
+                        "active" -> ConversationStatus.ACTIVE
+                        "pending" -> ConversationStatus.PENDING
+                        "resolved" -> ConversationStatus.RESOLVED
+                        "closed" -> ConversationStatus.CLOSED
+                        else -> ConversationStatus.ALL
+                    }
+                )
+            },
             conversations = conversations
         )
         

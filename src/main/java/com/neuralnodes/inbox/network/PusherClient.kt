@@ -125,7 +125,7 @@ class PusherClient(
             println("✅ Subscribed to client dashboard: $channelName")
             
             awaitClose {
-                unsubscribe(channelName)
+                unsubscribeFromChannel(channelName)
             }
         } catch (e: Exception) {
             println("❌ Failed to subscribe to client dashboard: ${e.message}")
@@ -221,31 +221,24 @@ class PusherClient(
      * Unsubscribe from escalation - Takes escalationId
      * Exact match to iOS SDK
      */
-    fun unsubscribe(escalationId: String) {
+    fun unsubscribeFromEscalation(escalationId: String) {
         val channelName = "private-escalation-$escalationId"
-        subscribedChannels.remove(channelName)?.let { channel ->
-            try {
-                println("🔕 [PUSHER] Unsubscribing from channel: $channelName")
-                channel.unbind("new-message", null)
-                channel.unbind("typing", null)
-                pusher?.unsubscribe(channelName)
-                println("✅ Unsubscribed from: $channelName")
-            } catch (e: Exception) {
-                println("⚠️ Error unsubscribing from $channelName: ${e.message}")
-            }
-        }
+        unsubscribeFromChannel(channelName)
     }
     
     /**
      * Unsubscribe from a channel with proper cleanup
      */
-    fun unsubscribe(channelName: String) {
+    private fun unsubscribeFromChannel(channelName: String) {
         subscribedChannels.remove(channelName)?.let { channel ->
             try {
+                println("🔕 [PUSHER] Unsubscribing from channel: $channelName")
                 // Unbind all events from the channel
                 channel.unbind("analytics-updated", null)
                 channel.unbind("new-escalation", null)
+                channel.unbind("escalation-update", null)
                 channel.unbind("new-message", null)
+                channel.unbind("typing", null)
                 channel.unbind("typing-indicator", null)
                 channel.unbind("status-changed", null)
                 pusher?.unsubscribe(channelName)
@@ -276,7 +269,7 @@ class PusherClient(
         try {
             // Unbind all channels
             subscribedChannels.keys.toList().forEach { channelName ->
-                unsubscribe(channelName)
+                unsubscribeFromChannel(channelName)
             }
             subscribedChannels.clear()
             

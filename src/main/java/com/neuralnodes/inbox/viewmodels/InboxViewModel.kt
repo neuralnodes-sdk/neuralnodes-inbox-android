@@ -39,6 +39,9 @@ class InboxViewModel(private val sdk: NeuralNodesInbox) : ViewModel() {
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
     
+    // Alias for compatibility with InboxView
+    val error: StateFlow<String?> = _errorMessage.asStateFlow()
+    
     private var hasSubscribed = false
     private var refreshTask: Job? = null
     private var isRefreshing = false // Prevent concurrent API calls

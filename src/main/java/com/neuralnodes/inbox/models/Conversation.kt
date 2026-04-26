@@ -10,6 +10,7 @@ data class Conversation(
     @SerializedName("contact_email") val contactEmail: String?,
     @SerializedName("contact_phone") val contactPhone: String?,
     @SerializedName("last_message_preview") val lastMessagePreview: String?,
+    @SerializedName("last_message_at") val lastMessageAt: Date?,
     @SerializedName("unread_count") val unreadCount: Int,
     @SerializedName("status") val status: String,
     @SerializedName("created_at") val createdAt: Date,
