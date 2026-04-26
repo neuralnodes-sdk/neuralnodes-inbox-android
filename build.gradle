@@ -1,8 +1,18 @@
-plugins {
-    id 'com.android.library' version '8.2.0'
-    id 'org.jetbrains.kotlin.android' version '1.9.22'
-    id 'maven-publish'
+buildscript {
+    ext.kotlin_version = '1.9.22'
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.2.2'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
 }
+
+apply plugin: 'com.android.library'
+apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'maven-publish'
 
 android {
     namespace 'com.neuralnodes.inbox'
@@ -21,6 +31,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        debug {
+            minifyEnabled false
+        }
     }
     
     compileOptions {
@@ -34,11 +47,16 @@ android {
     
     buildFeatures {
         viewBinding true
+        compose true
+    }
+    
+    composeOptions {
+        kotlinCompilerExtensionVersion = '1.5.8'
     }
 }
 
 dependencies {
-    // AndroidX - Compatible with compileSdk 34 and AGP 8.2.0
+    // AndroidX Core
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'
@@ -46,35 +64,46 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.3.2'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     
-    // Lifecycle - Compatible versions
+    // Jetpack Compose
+    def composeBom = platform('androidx.compose:compose-bom:2024.01.00')
+    implementation composeBom
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.compose.runtime:runtime'
+    implementation 'androidx.compose.foundation:foundation'
+    implementation 'androidx.activity:activity-compose:1.8.2'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0'
+    
+    // Accompanist (for SwipeRefresh in Compose)
+    implementation 'com.google.accompanist:accompanist-swiperefresh:0.32.0'
+    
+    // Lifecycle
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
     
-    // Coroutines - Compatible versions
+    // Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
     
-    // Networking - Compatible versions
+    // Networking
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
     
-    // Ably Real-time - Fixed version
+    // Ably Real-time
     implementation 'io.ably:ably-android:1.2.43'
     
     // Pusher Real-time
     implementation 'com.pusher:pusher-java-client:2.4.4'
     
-    // Firebase Cloud Messaging - Compatible BOM
+    // Firebase Cloud Messaging
     implementation platform('com.google.firebase:firebase-bom:32.7.0')
     implementation 'com.google.firebase:firebase-messaging'
     
-    // DataStore - Compatible version
+    // DataStore
     implementation 'androidx.datastore:datastore-preferences:1.0.0'
-    
-    // Splash Screen - Compatible version
-    implementation 'androidx.core:core-splashscreen:1.0.1'
     
     // Testing
     testImplementation 'junit:junit:4.13.2'
@@ -87,9 +116,47 @@ afterEvaluate {
         publications {
             release(MavenPublication) {
                 from components.release
-                groupId = 'com.github.neuralnodes-sdk'
+                groupId = 'com.neuralnodes.inbox'
                 artifactId = 'neuralnodes-inbox-android'
-                version = '1.0.0'
+                version = com.neuralnodes.inbox.SDKVersion.version
+                
+                pom {
+                    name = 'NeuralNodes Inbox SDK for Android'
+                    description = 'Official Android SDK for NeuralNodes Inbox - unified messaging platform'
+                    url = 'https://github.com/neuralnodes-sdk/neuralnodes-inbox-android'
+                    
+                    licenses {
+                        license {
+                            name = 'Proprietary'
+                            url = 'https://neuralnodes.space/license'
+                        }
+                    }
+                    
+                    developers {
+                        developer {
+                            id = 'neuralnodes'
+                            name = 'NeuralNodes Team'
+                            email = 'support@neuralnodes.com'
+                        }
+                    }
+                    
+                    scm {
+                        connection = 'scm:git:git://github.com/neuralnodes-sdk/neuralnodes-inbox-android.git'
+                        developerConnection = 'scm:git:ssh://github.com/neuralnodes-sdk/neuralnodes-inbox-android.git'
+                        url = 'https://github.com/neuralnodes-sdk/neuralnodes-inbox-android'
+                    }
+                }
+            }
+        }
+        
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/neuralnodes-sdk/neuralnodes-inbox-android")
+                credentials {
+                    username = System.getenv("GITHUB_ACTOR")
+                    password = System.getenv("GITHUB_TOKEN")
+                }
             }
         }
     }

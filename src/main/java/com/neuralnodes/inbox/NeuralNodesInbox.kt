@@ -4,9 +4,11 @@ import android.content.Context
 import android.content.Intent
 import com.neuralnodes.inbox.models.SDKConfig
 import com.neuralnodes.inbox.network.APIClient
+import com.neuralnodes.inbox.network.LiveChatClient
 import com.neuralnodes.inbox.network.RealtimeClient
 import com.neuralnodes.inbox.network.PusherClient
 import com.neuralnodes.inbox.services.PushNotificationService
+import com.neuralnodes.inbox.services.SearchService
 import com.neuralnodes.inbox.ui.InboxActivity
 import com.neuralnodes.inbox.ui.LiveChatActivity
 import kotlinx.coroutines.CoroutineScope
@@ -20,12 +22,17 @@ import kotlinx.coroutines.launch
 class NeuralNodesInbox private constructor(private val apiKey: String) {
     
     private val apiClient = APIClient(apiKey)
+    private val liveChatClient = LiveChatClient(apiClient)
     private val realtimeClient = RealtimeClient()
+    private val searchService = SearchService(apiClient, debounceInterval = 300L)
     private var pusherClient: PusherClient? = null
     private var config: SDKConfig? = null
     private var clientId: String? = null
     
     companion object {
+        val VERSION = SDKVersion.version
+        val FULL_VERSION = SDKVersion.fullVersion
+        
         @Volatile
         private var instance: NeuralNodesInbox? = null
         
@@ -44,6 +51,9 @@ class NeuralNodesInbox private constructor(private val apiKey: String) {
         fun getInstance(): NeuralNodesInbox {
             return instance ?: throw IllegalStateException("SDK not initialized. Call getInstance(apiKey) first.")
         }
+        
+        fun getVersion(): String = VERSION
+        fun getFullVersion(): String = FULL_VERSION
     }
     
     init {
@@ -57,6 +67,16 @@ class NeuralNodesInbox private constructor(private val apiKey: String) {
     suspend fun initialize(): Result<SDKConfig> {
         return try {
             val sdkConfig = apiClient.getConfig()
+            
+            // Check if SDK is enabled (matches iOS implementation)
+            if (!sdkConfig.enabled) {
+                val error = Exception(
+                    "Mobile SDK is not enabled for this account. Please contact support to enable it."
+                )
+                println("❌ SDK initialization failed: SDK not enabled")
+                return Result.failure(error)
+            }
+            
             config = sdkConfig
             
             // Get client info for Pusher (with error handling)
@@ -166,9 +186,26 @@ class NeuralNodesInbox private constructor(private val apiKey: String) {
     fun getAPIClient(): APIClient = apiClient
     
     /**
+     * Get LiveChat client for custom implementations
+     * Matches iOS SDK API
+     */
+    fun getLiveChatClient(): LiveChatClient = liveChatClient
+    
+    /**
      * Get Ably real-time client for custom implementations
      */
     fun getRealtimeClient(): RealtimeClient = realtimeClient
+    
+    /**
+     * Get Pusher client for custom implementations
+     */
+    fun getPusherClient(): PusherClient? = pusherClient
+    
+    /**
+     * Get search service for custom implementations
+     * Matches iOS SDK API
+     */
+    fun getSearchService(): SearchService = searchService
     
     /**
      * Get current SDK configuration
@@ -176,9 +213,35 @@ class NeuralNodesInbox private constructor(private val apiKey: String) {
     fun getConfig(): SDKConfig? = config
     
     /**
-     * Get Pusher client for custom implementations
+     * Check if SDK is initialized
      */
-    fun getPusherClient(): PusherClient? = pusherClient
+    val isInitialized: Boolean
+        get() = config != null
+    
+    /**
+     * Get color scheme based on dark mode setting
+     * Returns true if dark mode should be used
+     */
+    fun shouldUseDarkMode(): Boolean {
+        return config?.features?.darkMode == true
+    }
+    
+    /**
+     * Returns the appropriate color scheme based on dark mode setting
+     * Matches iOS getColorScheme() API
+     * @return null if dark mode is enabled (respects system), false if disabled (force light)
+     */
+    fun getColorScheme(): Boolean? {
+        val config = config ?: return null
+        
+        // Check if dark mode feature is enabled
+        if (!config.features.darkMode) {
+            return false // Force light mode
+        }
+        
+        // Otherwise respect system setting
+        return null
+    }
     
     /**
      * Disconnect and cleanup all resources
@@ -187,6 +250,7 @@ class NeuralNodesInbox private constructor(private val apiKey: String) {
     fun disconnect() {
         realtimeClient.disconnect()
         pusherClient?.disconnect()
+        searchService.cleanup()
         pusherClient = null
         config = null
         clientId = null

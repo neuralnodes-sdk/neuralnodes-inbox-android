@@ -175,6 +175,50 @@ class APIClient(private val apiKey: String, baseURL: String = "https://api.neura
         )
     }
     
+    // Additional LiveChat methods for LiveChatClient
+    suspend fun getEscalation(id: String): Escalation {
+        val response = api.getEscalation(id)
+        return response.escalation
+    }
+    
+    suspend fun sendEscalationMessage(escalationId: String, text: String): ChatMessage {
+        return sendClientMessage(escalationId, text)
+    }
+    
+    suspend fun transferEscalation(escalationId: String, toAgentId: String) {
+        api.transferEscalation(escalationId, mapOf("agent_id" to toAgentId))
+    }
+    
+    suspend fun sendTypingIndicator(escalationId: String, isTyping: Boolean) {
+        sendClientTypingIndicator(escalationId, isTyping)
+    }
+    
+    // Search methods for SearchService
+    suspend fun searchConversations(filters: com.neuralnodes.inbox.services.ConversationSearchFilters): com.neuralnodes.inbox.services.SearchConversationsResponse {
+        // Placeholder - implement when backend API is ready
+        return com.neuralnodes.inbox.services.SearchConversationsResponse(emptyList(), 0, false)
+    }
+    
+    suspend fun searchMessagesInConversation(
+        conversationId: String,
+        query: String,
+        limit: Int,
+        offset: Int
+    ): com.neuralnodes.inbox.services.SearchMessagesResponse {
+        // Placeholder - implement when backend API is ready
+        return com.neuralnodes.inbox.services.SearchMessagesResponse(emptyList(), 0, false)
+    }
+    
+    suspend fun searchAllMessages(filters: com.neuralnodes.inbox.services.MessageSearchFilters): com.neuralnodes.inbox.services.SearchMessagesResponse {
+        // Placeholder - implement when backend API is ready
+        return com.neuralnodes.inbox.services.SearchMessagesResponse(emptyList(), 0, false)
+    }
+    
+    suspend fun getSearchSuggestions(query: String, limit: Int): com.neuralnodes.inbox.services.SearchSuggestionsResponse {
+        // Placeholder - implement when backend API is ready
+        return com.neuralnodes.inbox.services.SearchSuggestionsResponse(emptyList())
+    }
+    
     // Client Info (for getting client ID)
     suspend fun getClientInfo(): ClientInfoResponse = api.getClientInfo()
 }
@@ -233,6 +277,9 @@ interface InboxAPI {
         @Query("offset") offset: Int
     ): EscalationsResponse
     
+    @GET("/client-portal/live-chat/escalations/{id}")
+    suspend fun getEscalation(@Path("id") id: String): EscalationResponse
+    
     @GET("/client-portal/live-chat/escalations/{id}/messages")
     suspend fun getEscalationMessages(
         @Path("id") escalationId: String,
@@ -261,9 +308,20 @@ interface InboxAPI {
         @Body body: Map<String, Boolean>
     )
     
+    @POST("/client-portal/live-chat/escalations/{id}/transfer")
+    suspend fun transferEscalation(
+        @Path("id") escalationId: String,
+        @Body body: Map<String, String>
+    )
+    
     @GET("/client-portal/info")
     suspend fun getClientInfo(): ClientInfoResponse
 }
+
+data class EscalationResponse(
+    @SerializedName("success") val success: Boolean,
+    @SerializedName("escalation") val escalation: Escalation
+)
 
 data class ClientInfoResponse(
     @SerializedName("id") val id: String,

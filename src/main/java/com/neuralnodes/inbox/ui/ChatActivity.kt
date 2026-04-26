@@ -73,8 +73,7 @@ class ChatActivity : AppCompatActivity() {
             // Update placeholder text
             binding.inputField.hint = com.neuralnodes.inbox.utils.UICustomizer.getCustomText(sdkConfig, "input_placeholder")
             
-            // Apply send button customization
-            binding.sendButton.text = com.neuralnodes.inbox.utils.UICustomizer.getCustomText(sdkConfig, "send_button")
+            // Apply send button customization (ImageButton doesn't have text property)
             com.neuralnodes.inbox.utils.UICustomizer.applyBranding(binding.sendButton, sdkConfig)
         }
         

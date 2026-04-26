@@ -1,61 +1,360 @@
-name: Auto Release
+name: Release and Publish
 
 on:
   push:
     branches:
       - main
-    paths:
-      - 'gradle.properties'
+      - master
 
 jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      packages: write
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Extract version from gradle.properties
-        id: version
+      
+      - name: Notify Slack - Build Started
+        uses: slackapi/slack-github-action@v1.25.0
+        with:
+          payload: |
+            {
+              "text": "🚀 Android SDK Build Started",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "🚀 Android SDK Build Started"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Repository:*\n${{ github.repository }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch:*\n${{ github.ref_name }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Triggered by:*\n${{ github.actor }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Workflow:*\n${{ github.workflow }}"
+                    }
+                  ]
+                },
+                {
+                  "type": "context",
+                  "elements": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "Commit: <${{ github.event.head_commit.url }}|${{ github.sha }}>"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+      
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+      
+      - name: Get version from SDKVersion.kt
+        id: get_version
         run: |
-          VERSION=$(grep "VERSION_NAME=" gradle.properties | cut -d'=' -f2)
+          # Extract version from SDKVersion.kt
+          VERSION=$(grep -o 'version = "[^"]*"' src/main/java/com/neuralnodes/inbox/SDKVersion.kt | cut -d'"' -f2)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Version: $VERSION"
-
+          echo "📦 Version from SDKVersion.kt: $VERSION"
+      
+      - name: Check if version changed
+        id: version_changed
+        run: |
+          # Check if SDKVersion.kt was modified in this commit
+          if git diff --name-only HEAD~1 HEAD | grep -q "src/main/java/com/neuralnodes/inbox/SDKVersion.kt"; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "✅ SDKVersion.kt was modified in this commit"
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ SDKVersion.kt was not modified, skipping release"
+          fi
+      
       - name: Check if tag exists
         id: check_tag
+        if: steps.version_changed.outputs.changed == 'true'
         run: |
-          if git rev-parse "v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+          VERSION="${{ steps.get_version.outputs.version }}"
+          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
             echo "exists=true" >> $GITHUB_OUTPUT
+            echo "⚠️ Tag v$VERSION already exists, skipping release"
           else
             echo "exists=false" >> $GITHUB_OUTPUT
+            echo "✅ Tag v$VERSION does not exist, proceeding with release"
           fi
-
-      - name: Create Release
-        if: steps.check_tag.outputs.exists == 'false'
-        uses: actions/create-release@v1
+      
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      
+      - name: Build and validate
+        if: steps.version_changed.outputs.changed == 'true' && steps.check_tag.outputs.exists == 'false'
+        run: |
+          echo "🔨 Building Android SDK..."
+          
+          # Build release AAR
+          ./gradlew clean assembleRelease --no-daemon --stacktrace
+          
+          echo "✅ Build completed successfully"
+          echo "📦 Android SDK is ready for distribution"
+      
+      - name: Publish to GitHub Packages
+        if: steps.version_changed.outputs.changed == 'true' && steps.check_tag.outputs.exists == 'false'
+        run: |
+          echo "📦 Publishing to GitHub Packages..."
+          ./gradlew publish --no-daemon
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+      
+      - name: Create Git tag
+        if: steps.version_changed.outputs.changed == 'true' && steps.check_tag.outputs.exists == 'false'
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+          git tag -a "v$VERSION" -m "Release version $VERSION"
+          git push origin "v$VERSION"
+      
+      - name: Generate changelog
+        if: steps.version_changed.outputs.changed == 'true' && steps.check_tag.outputs.exists == 'false'
+        id: changelog
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          
+          if [ -z "$PREV_TAG" ]; then
+            CHANGELOG="Initial release"
+          else
+            CHANGELOG=$(git log $PREV_TAG..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          fi
+          
+          # Save to file for GitHub release
+          echo "$CHANGELOG" > CHANGELOG.txt
+          
+          echo "Changelog generated"
+      
+      - name: Upload AAR to Release
+        if: steps.version_changed.outputs.changed == 'true' && steps.check_tag.outputs.exists == 'false'
+        run: |
+          # Find the built AAR
+          AAR_PATH=$(find build/outputs/aar -name "*.aar" -type f | head -n 1)
+          echo "Found AAR: $AAR_PATH"
+          
+          # Copy to release directory with version name
+          mkdir -p release
+          cp "$AAR_PATH" "release/neuralnodes-inbox-android-${{ steps.get_version.outputs.version }}.aar"
+      
+      - name: Create GitHub Release
+        if: steps.version_changed.outputs.changed == 'true' && steps.check_tag.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ steps.version.outputs.version }}
-          release_name: v${{ steps.version.outputs.version }}
-          body: |
-            ## NeuralNodes Inbox SDK for Android - v${{ steps.version.outputs.version }}
-            
-            ### Installation
-            
-            ```kotlin
-            dependencies {
-                implementation("com.github.neuralnodes-sdk:neuralnodes-inbox-android:v${{ steps.version.outputs.version }}")
-            }
-            ```
-            
-            ### Changes
-            
-            See commit history for details.
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: Release v${{ steps.get_version.outputs.version }}
+          body_path: CHANGELOG.txt
+          files: |
+            release/*.aar
           draft: false
           prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Post-release summary
+        if: steps.version_changed.outputs.changed == 'true' && steps.check_tag.outputs.exists == 'false'
+        run: |
+          echo "✅ Release v${{ steps.get_version.outputs.version }} created successfully!"
+          echo ""
+          echo "📦 Installation instructions:"
+          echo ""
+          echo "Add to your settings.gradle:"
+          echo ""
+          echo "dependencyResolutionManagement {"
+          echo "    repositories {"
+          echo "        maven {"
+          echo "            url = uri(\"https://maven.pkg.github.com/${{ github.repository }}\")"
+          echo "            credentials {"
+          echo "                username = project.findProperty(\"gpr.user\") ?: System.getenv(\"USERNAME\")"
+          echo "                password = project.findProperty(\"gpr.key\") ?: System.getenv(\"TOKEN\")"
+          echo "            }"
+          echo "        }"
+          echo "    }"
+          echo "}"
+          echo ""
+          echo "Add to your build.gradle:"
+          echo ""
+          echo "dependencies {"
+          echo "    implementation 'com.neuralnodes.inbox:neuralnodes-inbox-android:${{ steps.get_version.outputs.version }}'"
+          echo "}"
+          echo ""
+          echo "Or download AAR directly from:"
+          echo "https://github.com/${{ github.repository }}/releases/download/v${{ steps.get_version.outputs.version }}/neuralnodes-inbox-android-${{ steps.get_version.outputs.version }}.aar"
+      
+      - name: Validation-only summary
+        if: steps.version_changed.outputs.changed == 'false'
+        run: |
+          echo "✅ Package validation passed!"
+          echo "ℹ️ No version change detected, skipping release"
+          echo "📦 To create a release, update version in src/main/java/com/neuralnodes/inbox/SDKVersion.kt"
+      
+      - name: Notify Slack - Build Success
+        if: success() && steps.version_changed.outputs.changed == 'true' && steps.check_tag.outputs.exists == 'false'
+        uses: slackapi/slack-github-action@v1.25.0
+        with:
+          payload: |
+            {
+              "text": "✅ Android SDK Build Completed Successfully",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "✅ Android SDK Build Completed Successfully"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Repository:*\n${{ github.repository }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Version:*\nv${{ steps.get_version.outputs.version }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch:*\n${{ github.ref_name }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Triggered by:*\n${{ github.actor }}"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Installation:*\n```dependencies {\n    implementation 'com.neuralnodes.inbox:neuralnodes-inbox-android:${{ steps.get_version.outputs.version }}'\n}```"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Published to:*\n• GitHub Packages\n• GitHub Releases (AAR download)"
+                  }
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Release"
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/releases/tag/v${{ steps.get_version.outputs.version }}"
+                    },
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "Download AAR"
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/releases/download/v${{ steps.get_version.outputs.version }}/neuralnodes-inbox-android-${{ steps.get_version.outputs.version }}.aar"
+                    },
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Commit"
+                      },
+                      "url": "${{ github.event.head_commit.url }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+      
+      - name: Notify Slack - Build Failed
+        if: failure()
+        uses: slackapi/slack-github-action@v1.25.0
+        with:
+          payload: |
+            {
+              "text": "❌ Android SDK Build Failed",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "❌ Android SDK Build Failed"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Repository:*\n${{ github.repository }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch:*\n${{ github.ref_name }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Triggered by:*\n${{ github.actor }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Workflow:*\n${{ github.workflow }}"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Logs"
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

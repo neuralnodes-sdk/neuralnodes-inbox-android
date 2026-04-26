@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- User message bubble - matches iOS design with uniform rounded corners -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <solid android:color="#F3F4F6" />
-    <corners 
-        android:topLeftRadius="18dp"
-        android:topRightRadius="18dp"
-        android:bottomLeftRadius="4dp"
-        android:bottomRightRadius="18dp" />
+    <corners android:radius="20dp" />
 </shape>

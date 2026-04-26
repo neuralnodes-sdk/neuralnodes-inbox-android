@@ -1,41 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- iOS-style minimal chat layout - clean white background -->
 <androidx.coordinatorlayout.widget.CoordinatorLayout 
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="#F9FAFB">
 
-    <!-- Modern App Bar with Gradient - Edge to Edge -->
+    <!-- Simple Toolbar - iOS style -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_gradient_header"
+        android:background="#FFFFFF"
         android:elevation="0dp"
-        android:fitsSystemWindows="false"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:background="@android:color/transparent"
-            android:contentInsetStart="0dp"
-            android:contentInsetEnd="0dp"
-            android:contentInsetLeft="0dp"
-            android:contentInsetRight="0dp"
-            app:contentInsetStart="0dp"
-            app:contentInsetEnd="0dp"
-            app:contentInsetLeft="0dp"
-            app:contentInsetRight="0dp"
-            app:contentInsetStartWithNavigation="0dp"
-            app:contentInsetEndWithActions="0dp"
-            app:titleMarginStart="0dp"
-            app:titleMarginEnd="0dp"
-            app:titleTextColor="#FFFFFF"
-            app:navigationIconTint="#FFFFFF"
-            app:menu="@menu/menu_chat"
-            app:titleTextAppearance="@style/TextAppearance.Title" />
+            android:layout_height="56dp"
+            android:background="#FFFFFF"
+            app:titleTextColor="#000000"
+            app:navigationIconTint="#4A6EE0"
+            app:menu="@menu/menu_chat" />
+
+        <!-- Subtle divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="#E5E7EB" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -44,100 +37,86 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:background="#FFFFFF">
+        android:background="#F9FAFB">
 
-        <!-- Messages List with Professional Spacing -->
+        <!-- Messages List - iOS style clean -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="88dp"
+            android:layout_marginBottom="72dp"
             android:clipToPadding="false"
             android:paddingTop="8dp"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:paddingBottom="32dp"
+            android:paddingBottom="16dp"
             android:scrollbars="none"
             android:overScrollMode="never"
-            android:background="#FFFFFF" />
+            android:background="#F9FAFB" />
 
         <ProgressBar
             android:id="@+id/progressBar"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_gravity="center"
-            android:indeterminateTint="#3B82F6"
+            android:indeterminateTint="#4A6EE0"
             android:visibility="gone" />
 
-        <!-- Premium Input Container -->
-        <com.google.android.material.card.MaterialCardView
+        <!-- Minimal Input Container - iOS style -->
+        <LinearLayout
             android:id="@+id/inputContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:layout_margin="0dp"
-            app:cardBackgroundColor="#FFFFFF"
-            app:cardElevation="12dp"
-            app:cardCornerRadius="0dp">
+            android:orientation="vertical"
+            android:background="#FFFFFF">
+
+            <!-- Top divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="#E5E7EB" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="16dp"
+                android:padding="12dp"
                 android:gravity="center_vertical"
-                android:minHeight="72dp"
                 android:background="#FFFFFF">
 
-                <!-- Modern Input Field with Border -->
-                <FrameLayout
+                <!-- Simple Input Field - iOS style -->
+                <EditText
+                    android:id="@+id/inputField"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="@drawable/bg_input_field">
+                    android:hint="Type a message..."
+                    android:textColorHint="#9CA3AF"
+                    android:textColor="#000000"
+                    android:textSize="17sp"
+                    android:imeOptions="actionSend"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:maxLines="5"
+                    android:minHeight="36dp"
+                    android:paddingVertical="8dp"
+                    android:paddingHorizontal="12dp"
+                    android:background="@drawable/bg_input_field"
+                    android:fontFamily="sans-serif" />
 
-                    <EditText
-                        android:id="@+id/inputField"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Type your message..."
-                        android:textColorHint="#9CA3AF"
-                        android:textColor="#111827"
-                        android:textSize="15sp"
-                        android:imeOptions="actionSend"
-                        android:inputType="textCapSentences|textMultiLine"
-                        android:maxLines="5"
-                        android:minHeight="48dp"
-                        android:paddingVertical="12dp"
-                        android:paddingHorizontal="20dp"
-                        android:background="@android:color/transparent"
-                        android:fontFamily="sans-serif" />
-
-                </FrameLayout>
-
-                <!-- Premium Send Button -->
-                <com.google.android.material.button.MaterialButton
+                <!-- Simple Send Button - iOS style -->
+                <ImageButton
                     android:id="@+id/sendButton"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:layout_marginStart="12dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="8dp"
                     android:enabled="false"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:insetLeft="0dp"
-                    android:insetRight="0dp"
-                    app:icon="@drawable/ic_send"
-                    app:iconGravity="textStart"
-                    app:iconPadding="0dp"
-                    app:iconSize="24dp"
-                    app:iconTint="@android:color/white"
-                    app:cornerRadius="28dp"
-                    app:backgroundTint="@color/nn_primary"
-                    app:elevation="4dp" />
+                    android:src="@drawable/ic_send"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    app:tint="#4A6EE0"
+                    android:contentDescription="Send" />
 
             </LinearLayout>
 
-        </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
 
     </FrameLayout>
 

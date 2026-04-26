@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- iOS-style gradient background for channel icons -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <gradient
+        android:type="radial"
+        android:gradientRadius="26dp"
+        android:startColor="#1A4A6EE0"
+        android:endColor="#0A4A6EE0" />
+</shape>

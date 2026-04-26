@@ -38,45 +38,34 @@ class ConversationAdapter(
         
         fun bind(conversation: Conversation) {
             binding.apply {
-                // Channel icon
-                channelIcon.text = conversation.channelIcon
+                // Avatar - first letter of name
+                avatarText.text = conversation.displayName.firstOrNull()?.uppercase() ?: "A"
                 
                 // Contact name
                 contactName.text = conversation.displayName
                 
-                // Channel text
-                channelText.text = when (conversation.channel) {
-                    "webchat" -> "Web Chat"
-                    "whatsapp" -> "WhatsApp"
-                    "telegram" -> "Telegram"
-                    "email" -> "Email"
-                    else -> conversation.channel.capitalize()
+                // Status - minimal dot + text
+                statusText.text = conversation.status.capitalize()
+                val statusColor = when (conversation.status.lowercase()) {
+                    "active" -> 0xFF10B981.toInt()
+                    "resolved" -> 0xFF6B7280.toInt()
+                    "closed" -> 0xFF6B7280.toInt()
+                    else -> 0xFF6B7280.toInt()
                 }
+                statusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(statusColor)
+                statusText.setTextColor(statusColor)
                 
-                // Last message
-                lastMessage.text = conversation.lastMessage ?: "No messages"
-                
-                // Time (shorter format)
-                timestamp.text = formatTimeShort(conversation.updatedAt)
-                
-                // Status badge
-                statusBadge.text = conversation.status.capitalize()
-                statusBadge.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                    when (conversation.status.lowercase()) {
-                        "active" -> 0xFF4A6EE0.toInt()
-                        "resolved" -> 0xFF10B981.toInt()
-                        "closed" -> 0xFF6B7280.toInt()
-                        else -> 0xFF4A6EE0.toInt()
-                    }
-                )
-                
-                // Unread badge
-                if (conversation.unreadCount > 0) {
-                    unreadBadge.visibility = View.VISIBLE
-                    unreadCount.text = if (conversation.unreadCount > 9) "9+" else conversation.unreadCount.toString()
+                // Last message with sender prefix
+                val messagePrefix = if (conversation.lastMessage?.startsWith("Bot:") == true || 
+                                      conversation.lastMessage?.startsWith("User:") == true) {
+                    ""
                 } else {
-                    unreadBadge.visibility = View.GONE
+                    "User: "
                 }
+                lastMessage.text = messagePrefix + (conversation.lastMessage ?: "No messages")
+                
+                // Time - iOS style short format
+                timestamp.text = formatTimeShort(conversation.updatedAt)
                 
                 // Click listener
                 root.setOnClickListener {
@@ -90,7 +79,6 @@ class ConversationAdapter(
             val diff = now.time - date.time
             
             return when {
-                diff < 60_000 -> "now"
                 diff < 3600_000 -> "${diff / 60_000}m"
                 diff < 86400_000 -> "${diff / 3600_000}h"
                 diff < 604800_000 -> "${diff / 86400_000}d"

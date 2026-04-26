@@ -19,15 +19,8 @@ class ChatMessageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private const val VIEW_TYPE_AGENT = 2
         
         private fun formatTime(date: Date): String {
-            val now = Date()
-            val diff = now.time - date.time
-            
-            return when {
-                diff < 60000 -> "Just now"
-                diff < 3600000 -> SimpleDateFormat("HH:mm", Locale.getDefault()).format(date)
-                diff < 86400000 -> SimpleDateFormat("HH:mm", Locale.getDefault()).format(date)
-                else -> SimpleDateFormat("MMM dd HH:mm", Locale.getDefault()).format(date)
-            }
+            // iOS-style time format: "15:56"
+            return SimpleDateFormat("HH:mm", Locale.getDefault()).format(date)
         }
     }
     
@@ -37,20 +30,19 @@ class ChatMessageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
     
     override fun getItemViewType(position: Int): Int {
-        // Agent (you) = RIGHT/BLUE, Customer = LEFT/GRAY
+        // Agent messages = blue bubbles on right
+        // User/Customer messages = gray bubbles on left
         return if (messages[position].isFromAgent) VIEW_TYPE_AGENT else VIEW_TYPE_USER
     }
     
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             VIEW_TYPE_AGENT -> {
-                // Agent messages on RIGHT with BLUE background
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_message_agent, parent, false)
                 AgentMessageViewHolder(view)
             }
             else -> {
-                // User/Customer messages on LEFT with GRAY background
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_message_user, parent, false)
                 UserMessageViewHolder(view)
@@ -69,10 +61,15 @@ class ChatMessageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun getItemCount() = messages.size
     
     class UserMessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val senderName: TextView = itemView.findViewById(R.id.senderName)
         private val messageText: TextView = itemView.findViewById(R.id.messageText)
         private val messageTime: TextView = itemView.findViewById(R.id.messageTime)
         
         fun bind(message: ChatMessage) {
+            // Show sender name - iOS style
+            senderName.text = message.displaySenderName
+            senderName.visibility = View.VISIBLE
+            
             messageText.text = message.messageText
             messageTime.text = formatTime(message.createdAt)
         }

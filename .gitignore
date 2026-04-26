@@ -83,3 +83,6 @@ lint/tmp/
 
 
 commands.txt
+
+.kiro
+graphify-out

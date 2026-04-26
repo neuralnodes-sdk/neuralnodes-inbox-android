@@ -2,109 +2,166 @@
 
 [![Platform](https://img.shields.io/badge/platform-Android-green.svg)](https://android.com)
 [![API](https://img.shields.io/badge/API-24%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=24)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![JitPack](https://jitpack.io/v/neuralnodes/neuralnodes-inbox-android.svg)](https://jitpack.io/#neuralnodes/neuralnodes-inbox-android)
+[![GitHub Release](https://img.shields.io/github/v/release/neuralnodes-sdk/neuralnodes-inbox-android)](https://github.com/neuralnodes-sdk/neuralnodes-inbox-android/releases)
 
-The official Android SDK for NeuralNodes Inbox - a unified messaging platform that enables Customer Support Representatives (CSRs) to manage conversations from web chat, WhatsApp, Telegram, and email in a single mobile application.
+A powerful, flexible Android SDK for integrating customer support inbox functionality into your app. Choose from plug-and-play UI components or build completely custom interfaces with our headless API.
 
 ## Features
 
-- **Unified Inbox**: Manage all conversations from one place
-- **Multi-Channel Support**: Web Chat, WhatsApp, Telegram, Email
-- **Real-Time Messaging**: Instant message delivery via Ably
-- **Push Notifications**: FCM-powered notifications for new messages
-- **File Attachments**: Send and receive images, documents, and files
-- **Customizable Branding**: Match your brand colors and logo
-- **Offline Support**: Queue messages when offline, sync when online
-- **Conversation Management**: Mark as read, resolve, filter by status
-- **Material Design**: Modern, native Android UI components
-- **Secure Communication**: End-to-end encrypted messaging
+- **Multi-channel Support** - WhatsApp, Email, SMS, Web Chat
+- **Real-time Messaging** - Instant message delivery with Ably and Pusher
+- **Live Chat Escalations** - Handle escalated conversations
+- **Push Notifications** - FCM integration for message alerts
+- **Status Management** - Active, Pending, Resolved, Closed workflows
+- **Message Pagination** - Efficient loading of conversation history
+- **Optimistic Updates** - Instant UI feedback
+- **Flexible Integration** - Use pre-built UI or build your own
 
 ## Requirements
 
-- **Minimum SDK**: Android 7.0 (API level 24)
-- **Target SDK**: Android 14 (API level 34)
-- **Language**: Kotlin 1.9+
-- **Dependencies**: AndroidX, Kotlin Coroutines
+- Android 7.0+ (API level 24)
+- Kotlin 1.9+
+- AndroidX
+- Java 17+
 
 ## Installation
 
-### Step 1: Add JitPack Repository
+### Prerequisites
 
-Add JitPack to your root `settings.gradle` or `settings.gradle.kts`:
+You'll need a GitHub Personal Access Token (PAT) to access GitHub Packages:
 
-**Groovy (settings.gradle):**
-```gradle
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-        maven { url 'https://jitpack.io' }
-    }
-}
-```
+1. Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
+2. Generate new token with `read:packages` scope
+3. Save the token securely
 
-**Kotlin (settings.gradle.kts):**
+### Gradle (Kotlin DSL)
+
+Add GitHub Packages repository to your `settings.gradle.kts`:
+
 ```kotlin
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
-        maven { url = uri("https://jitpack.io") }
+        
+        // GitHub Packages
+        maven {
+            url = uri("https://maven.pkg.github.com/neuralnodes-sdk/neuralnodes-inbox-android")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 }
 ```
 
-### Step 2: Add SDK Dependency
+Add your credentials to `~/.gradle/gradle.properties`:
 
-Add the SDK to your app's `build.gradle` or `build.gradle.kts`:
-
-**Groovy (build.gradle):**
-```gradle
-dependencies {
-    implementation 'com.github.neuralnodes:neuralnodes-inbox-android:1.0.0'
-}
+```properties
+gpr.user=YOUR_GITHUB_USERNAME
+gpr.key=YOUR_GITHUB_TOKEN
 ```
 
-**Kotlin (build.gradle.kts):**
+Add the SDK to your app's `build.gradle.kts`:
+
 ```kotlin
 dependencies {
-    implementation("com.github.neuralnodes:neuralnodes-inbox-android:1.0.0")
+    implementation("com.neuralnodes.inbox:neuralnodes-inbox-android:2.2.0")
 }
 ```
 
-### Step 3: Sync Project
+### Gradle (Groovy)
 
-Click **"Sync Now"** in Android Studio to download the SDK.
+Add GitHub Packages repository to your `settings.gradle`:
+
+```gradle
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        
+        // GitHub Packages
+        maven {
+            url = uri("https://maven.pkg.github.com/neuralnodes-sdk/neuralnodes-inbox-android")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
+```
+
+Add your credentials to `~/.gradle/gradle.properties`:
+
+```properties
+gpr.user=YOUR_GITHUB_USERNAME
+gpr.key=YOUR_GITHUB_TOKEN
+```
+
+Add the SDK to your app's `build.gradle`:
+
+```gradle
+dependencies {
+    implementation 'com.neuralnodes.inbox:neuralnodes-inbox-android:2.2.0'
+}
+```
+
+### Alternative: Direct AAR Download
+
+If you prefer not to use GitHub Packages, you can download the AAR directly:
+
+1. Go to [Releases](https://github.com/neuralnodes-sdk/neuralnodes-inbox-android/releases)
+2. Download `neuralnodes-inbox-android-{version}.aar`
+3. Place it in your `app/libs/` folder
+4. Add to your `build.gradle`:
+
+```gradle
+dependencies {
+    implementation files('libs/neuralnodes-inbox-android-2.2.0.aar')
+    
+    // Add required dependencies
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'io.ably:ably-android:1.2.43'
+    implementation 'com.pusher:pusher-java-client:2.4.4'
+    
+    // Jetpack Compose (if using Component mode)
+    def composeBom = platform('androidx.compose:compose-bom:2024.01.00')
+    implementation composeBom
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.activity:activity-compose:1.8.2'
+}
+```
 
 ## Quick Start
 
 ### 1. Initialize the SDK
 
 ```kotlin
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import com.neuralnodes.inbox.NeuralNodesInbox
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var inbox: NeuralNodesInbox
+    private lateinit var sdk: NeuralNodesInbox
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
         
-        // Initialize SDK with your API key
-        inbox = NeuralNodesInbox("your-api-key-here")
+        sdk = NeuralNodesInbox.getInstance("your-api-key")
         
-        // Load configuration
         lifecycleScope.launch {
-            inbox.initialize().onSuccess { config ->
+            sdk.initialize().onSuccess { config ->
                 println("SDK initialized successfully")
-                println("Features: ${config.features}")
             }.onFailure { error ->
                 println("Initialization failed: ${error.message}")
             }
@@ -113,44 +170,342 @@ class MainActivity : AppCompatActivity() {
 }
 ```
 
-### 2. Display the Inbox
+### 2. Choose Your Integration Level
+
+The SDK offers three integration approaches, from easiest to most customizable:
+
+---
+
+## Integration Options
+
+### Option 1: Plug & Play (Fastest) ⚡
+
+**Best for:** Quick integration, standard UI requirements
+
+Get a complete inbox interface with just one line of code:
 
 ```kotlin
-import android.widget.Button
+import com.neuralnodes.inbox.NeuralNodesInbox
 
 class MainActivity : AppCompatActivity() {
-    // ... initialization code ...
+    private lateinit var sdk: NeuralNodesInbox
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
         
+        sdk = NeuralNodesInbox.getInstance("your-api-key")
+        
+        // Initialize SDK
+        lifecycleScope.launch {
+            sdk.initialize()
+        }
+        
+        // Show full inbox UI
         findViewById<Button>(R.id.openInboxButton).setOnClickListener {
-            // Show the inbox UI
-            inbox.showInbox(this)
+            sdk.showInbox(this)
+        }
+        
+        // Show live chat UI
+        findViewById<Button>(R.id.openChatButton).setOnClickListener {
+            sdk.showLiveChat(this)
         }
     }
 }
 ```
 
-### 3. Setup Push Notifications (Optional)
+**What you get:**
+- Complete inbox and live chat UI
+- All features working out of the box
+- Professional, tested interface
+- Zero UI code required
 
-#### Add Firebase to Your Project
+**Time to integrate:** 5 minutes
 
-1. Add Firebase to your app: https://firebase.google.com/docs/android/setup
-2. Download `google-services.json` and place it in your `app/` folder
+---
 
-#### Configure FCM
+### Option 2: Component Integration (Flexible) 🎨
 
-**Add dependencies:**
-```gradle
-dependencies {
-    implementation platform('com.google.firebase:firebase-bom:32.7.0')
-    implementation 'com.google.firebase:firebase-messaging-ktx'
+**Best for:** Custom app structure, branded experience
+
+Use individual SDK views within your own navigation:
+
+#### Jetpack Compose
+
+```kotlin
+import androidx.compose.runtime.Composable
+import com.neuralnodes.inbox.compose.*
+
+@Composable
+fun MyApp() {
+    val sdk = NeuralNodesInbox.getInstance()
+    
+    // Use individual composable views
+    Column {
+        Text("My Custom Header")
+        
+        // Embed inbox view
+        InboxView(
+            sdk = sdk,
+            onConversationClick = { conversation ->
+                // Navigate to conversation detail
+            }
+        )
+    }
 }
 ```
 
-**Register device token:**
+#### Available Composable Views
+
+```kotlin
+// Main Views
+InboxView(sdk = sdk)                                    // Conversation list with filters
+LiveChatView(escalationId = id, sdk = sdk)             // Live chat interface
+InboxTabView(sdk = sdk)                                 // Complete tab bar UI
+
+// Utility Views
+EmptyStateView(icon = "📭", title = "No Messages")     // Empty state
+ErrorView(message = "Error", onRetry = {})             // Error state
+LoadingView()                                           // Loading indicator
+SearchBar(searchText = text, onSearch = {})            // Search bar
+ConnectionBanner()                                      // Connection status
+```
+
+#### XML + Fragments
+
+```kotlin
+import com.neuralnodes.inbox.fragments.InboxFragment
+
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        
+        val sdk = NeuralNodesInbox.getInstance()
+        
+        // Embed inbox fragment
+        val fragment = InboxFragment.newInstance(sdk)
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.container, fragment)
+            .commit()
+    }
+}
+```
+
+**Layout XML:**
+```xml
+<FrameLayout
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" />
+```
+
+#### Example: Bottom Navigation
+
+```kotlin
+class MainActivity : AppCompatActivity() {
+    private lateinit var sdk: NeuralNodesInbox
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        
+        sdk = NeuralNodesInbox.getInstance("your-api-key")
+        
+        bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> showHomeFragment()
+                R.id.nav_inbox -> showInboxFragment()  // SDK fragment
+                R.id.nav_profile -> showProfileFragment()
+            }
+            true
+        }
+    }
+    
+    private fun showInboxFragment() {
+        val fragment = InboxFragment.newInstance(sdk)
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.container, fragment)
+            .commit()
+    }
+}
+```
+
+**Time to integrate:** 30 minutes
+
+---
+
+### Option 3: Headless API (Full Control) 🔧
+
+**Best for:** Completely custom UI, unique design requirements
+
+Build your own interface using SDK data and APIs:
+
+#### Get API Clients
+
+```kotlin
+val apiClient = sdk.getAPIClient()
+val liveChatClient = sdk.getLiveChatClient()
+val realtimeClient = sdk.getRealtimeClient()
+val pusherClient = sdk.getPusherClient()
+val searchService = sdk.getSearchService()
+```
+
+#### Fetch Conversations
+
+```kotlin
+// Get conversations with filters
+val conversations = apiClient.getConversations(
+    channel = "whatsapp",
+    status = "active",
+    limit = 20,
+    offset = 0
+)
+
+// Get specific conversation
+val conversation = apiClient.getConversation(conversationId)
+
+// Get messages
+val messages = apiClient.getConversationMessages(
+    conversationId = conversationId,
+    limit = 50,
+    offset = 0
+)
+```
+
+#### Send Messages
+
+```kotlin
+val message = apiClient.sendMessage(
+    conversationId = conversationId,
+    text = "Hello, how can I help?"
+)
+```
+
+#### Update Status
+
+```kotlin
+apiClient.updateConversationStatus(
+    conversationId = conversationId,
+    status = "resolved"
+)
+
+apiClient.markAsRead(conversationId)
+```
+
+#### Real-time Updates
+
+```kotlin
+// Subscribe to conversation updates
+lifecycleScope.launch {
+    realtimeClient.subscribeToConversation(conversationId).collect { message ->
+        // Update your UI with new message
+        println("New message: ${message.messageText}")
+    }
+}
+
+// Unsubscribe when done
+realtimeClient.unsubscribe(conversationId)
+```
+
+#### Live Chat
+
+```kotlin
+// Get escalations
+val escalations = liveChatClient.getEscalations(limit = 50)
+
+// Get escalation messages
+val messages = liveChatClient.getEscalationMessages(
+    escalationId = escalationId,
+    limit = 50,
+    offset = 0
+)
+
+// Send message
+val message = liveChatClient.sendEscalationMessage(
+    escalationId = escalationId,
+    text = "Message text"
+)
+
+// Subscribe to live chat updates
+pusherClient?.subscribeToEscalation(
+    escalationId,
+    onMessage = { message ->
+        // Handle new message
+    },
+    onTyping = { isTyping ->
+        // Handle typing indicator
+    }
+)
+```
+
+#### Example: Custom ViewModel
+
+```kotlin
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.neuralnodes.inbox.NeuralNodesInbox
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+
+class CustomInboxViewModel : ViewModel() {
+    private val sdk = NeuralNodesInbox.getInstance()
+    private val apiClient = sdk.getAPIClient()
+    
+    private val _conversations = MutableStateFlow<List<Conversation>>(emptyList())
+    val conversations: StateFlow<List<Conversation>> = _conversations
+    
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+    
+    fun loadConversations() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val result = apiClient.getConversations()
+                _conversations.value = result
+            } catch (e: Exception) {
+                println("Error: ${e.message}")
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+    
+    fun sendMessage(conversationId: String, text: String) {
+        viewModelScope.launch {
+            try {
+                val message = apiClient.sendMessage(conversationId, text)
+                // Update your UI
+            } catch (e: Exception) {
+                println("Error: ${e.message}")
+            }
+        }
+    }
+}
+```
+
+**Time to integrate:** 2-4 hours
+
+---
+
+## Push Notifications
+
+### 1. Add Firebase
+
+Add Firebase to your project: https://firebase.google.com/docs/android/setup
+
+Add dependencies to your `build.gradle`:
+
+```gradle
+dependencies {
+    implementation platform('com.google.firebase:firebase-bom:32.7.0')
+    implementation 'com.google.firebase:firebase-messaging'
+}
+```
+
+### 2. Register Device Token
+
 ```kotlin
 import com.google.firebase.messaging.FirebaseMessaging
 
@@ -158,175 +513,295 @@ FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
     if (task.isSuccessful) {
         val token = task.result
         lifecycleScope.launch {
-            inbox.registerForPushNotifications(token)
+            sdk.registerForPushNotifications(token)
         }
     }
 }
 ```
 
-## Configuration
+### 3. Handle Notifications
 
-All configuration is managed through your NeuralNodes Dashboard:
+```kotlin
+class MyFirebaseMessagingService : FirebaseMessagingService() {
+    override fun onMessageReceived(remoteMessage: RemoteMessage) {
+        val sdk = NeuralNodesInbox.getInstance()
+        val (conversationId, escalationId) = sdk.handlePushNotification(
+            remoteMessage.data
+        )
+        
+        // Navigate to conversation if needed
+        conversationId?.let {
+            // Open conversation
+        }
+    }
+}
+```
 
-1. Login to your dashboard at https://client.neuralnodes.space
-2. Navigate to Settings → Mobile SDK
-3. Configure the following options:
-   - Enable/disable SDK
-   - Brand colors (primary, secondary, accent)
-   - Push notifications
-   - File uploads
-   - Voice messages
-   - Typing indicators
-   - Read receipts
-
-Configuration changes apply instantly to all devices without requiring app updates.
+---
 
 ## API Reference
 
-### NeuralNodesInbox
-
-Main SDK class for managing conversations.
+### Core SDK
 
 ```kotlin
-class NeuralNodesInbox(apiKey: String)
+// Initialize
+val sdk = NeuralNodesInbox.getInstance(apiKey: String)
+suspend fun initialize(): Result<SDKConfig>
+
+// Properties
+sdk.isInitialized: Boolean
+NeuralNodesInbox.VERSION: String
+NeuralNodesInbox.FULL_VERSION: String
+
+// Get Clients
+sdk.getAPIClient(): APIClient
+sdk.getLiveChatClient(): LiveChatClient
+sdk.getRealtimeClient(): RealtimeClient
+sdk.getPusherClient(): PusherClient?
+sdk.getSearchService(): SearchService
+
+// Push Notifications
+suspend fun registerForPushNotifications(token: String)
+fun handlePushNotification(data: Map<String, String>): Pair<String?, String?>
+
+// Cleanup
+fun disconnect()
 ```
-
-#### Methods
-
-| Method | Description | Return Type |
-|--------|-------------|-------------|
-| `suspend fun initialize()` | Load SDK configuration from server | `Result<SDKConfig>` |
-| `fun showInbox(context: Context)` | Display the inbox UI | `Unit` |
-| `suspend fun registerForPushNotifications(token: String)` | Register FCM device token | `Result<Unit>` |
-| `fun handlePushNotification(data: Map<String, String>)` | Handle incoming push notification | `String?` |
 
 ### APIClient
 
-Low-level HTTP client for custom implementations.
-
 ```kotlin
-class APIClient(apiKey: String, baseUrl: String = "https://api.neuralnodes.space")
+// Configuration
+suspend fun getConfig(): SDKConfig
+
+// Conversations
+suspend fun getConversations(
+    channel: String? = null,
+    status: String? = null,
+    limit: Int = 50,
+    offset: Int = 0
+): List<Conversation>
+
+suspend fun getConversation(id: String): Conversation
+
+suspend fun getConversationMessages(
+    conversationId: String,
+    limit: Int = 50,
+    offset: Int = 0
+): List<Message>
+
+suspend fun sendMessage(
+    conversationId: String,
+    text: String
+): Message
+
+suspend fun updateConversationStatus(
+    conversationId: String,
+    status: String
+)
+
+suspend fun markAsRead(conversationId: String)
 ```
 
-#### Methods
+### LiveChatClient
 
-| Method | Description | Return Type |
-|--------|-------------|-------------|
-| `suspend fun getConversations(...)` | Fetch conversations with filters | `List<Conversation>` |
-| `suspend fun getMessages(conversationId: String)` | Get messages for a conversation | `List<Message>` |
-| `suspend fun sendMessage(conversationId: String, text: String)` | Send a text message | `Message` |
-| `suspend fun markAsRead(conversationId: String)` | Mark conversation as read | `Unit` |
-| `suspend fun updateStatus(conversationId: String, status: String)` | Update conversation status | `Unit` |
+```kotlin
+suspend fun getEscalations(
+    status: String? = null,
+    limit: Int = 50,
+    offset: Int = 0
+): List<Escalation>
 
-### Models
+suspend fun getEscalationMessages(
+    escalationId: String,
+    limit: Int = 100,
+    offset: Int = 0
+): List<ChatMessage>
 
-#### Conversation
+suspend fun sendEscalationMessage(
+    escalationId: String,
+    text: String
+): ChatMessage
+
+suspend fun resolveEscalation(
+    escalationId: String,
+    notes: String? = null
+)
+
+suspend fun endEscalation(
+    escalationId: String,
+    reason: String? = null
+)
+
+suspend fun transferEscalation(
+    escalationId: String,
+    toAgentId: String
+)
+```
+
+### RealtimeClient
+
+```kotlin
+fun subscribeToConversation(conversationId: String): Flow<Message>
+fun unsubscribe(conversationId: String)
+```
+
+### PusherClient
+
+```kotlin
+fun subscribeToEscalation(
+    escalationId: String,
+    onMessage: (ChatMessage) -> Unit,
+    onTyping: (Boolean) -> Unit
+)
+
+fun unsubscribe(escalationId: String)
+```
+
+---
+
+## Models
+
+### Conversation
+
 ```kotlin
 data class Conversation(
     val id: String,
-    val channel: String,              // "web", "whatsapp", "telegram", "email"
+    val channel: String,
+    val status: String,
     val contactName: String?,
     val contactPhone: String?,
+    val contactEmail: String?,
     val lastMessage: String?,
+    val lastMessageAt: Date?,
     val unreadCount: Int,
-    val status: String,               // "active", "pending", "resolved"
     val createdAt: Date,
     val updatedAt: Date
 )
 ```
 
-#### Message
+### Message
+
 ```kotlin
 data class Message(
     val id: String,
     val conversationId: String,
+    val messageType: String,
     val messageText: String,
-    val senderType: String,           // "user", "agent", "bot"
+    val senderType: String,
     val senderName: String?,
-    val attachmentUrl: String?,
+    val senderId: String?,
+    val isRead: Boolean,
+    val readAt: Date?,
     val createdAt: Date
 )
 ```
 
-## Advanced Usage
-
-### Custom UI Implementation
-
-Build your own UI using the SDK's API client:
+### Escalation
 
 ```kotlin
-import com.neuralnodes.inbox.network.APIClient
-import kotlinx.coroutines.flow.MutableStateFlow
+data class Escalation(
+    val id: String,
+    val conversationId: String,
+    val status: String,
+    val reason: String?,
+    val customerName: String?,
+    val lastMessageAt: Date?,
+    val createdAt: Date
+)
+```
 
-class CustomInboxViewModel {
-    private val apiClient = APIClient("your-api-key")
-    val conversations = MutableStateFlow<List<Conversation>>(emptyList())
-    
-    suspend fun loadConversations(channel: String? = null, status: String? = null) {
-        try {
-            val result = apiClient.getConversations(
-                channel = channel,
-                status = status,
-                limit = 50,
-                offset = 0
-            )
-            conversations.value = result
-        } catch (e: Exception) {
-            println("Error loading conversations: ${e.message}")
-        }
-    }
-    
-    suspend fun sendMessage(conversationId: String, text: String) {
-        try {
-            val message = apiClient.sendMessage(conversationId, text)
-            println("Message sent: ${message.id}")
-        } catch (e: Exception) {
-            println("Error sending message: ${e.message}")
+### ChatMessage
+
+```kotlin
+data class ChatMessage(
+    val id: String,
+    val escalationId: String,
+    val messageType: String,
+    val messageText: String,
+    val senderType: String,
+    val senderName: String?,
+    val createdAt: Date
+)
+```
+
+---
+
+## Comparison Table
+
+| Feature | Plug & Play | Component | Headless API |
+|---------|-------------|-----------|--------------|
+| **Setup Time** | 5 minutes | 30 minutes | 2-4 hours |
+| **UI Control** | Low | Medium | Full |
+| **Customization** | Theme only | Layout & Navigation | Everything |
+| **Code Required** | 1 line | 10-50 lines | 100+ lines |
+| **Best For** | Quick setup | Branded apps | Unique designs |
+| **Maintenance** | SDK handles | Shared | You handle |
+
+---
+
+## Best Practices
+
+### 1. Initialize Early
+
+Initialize the SDK in your Application class or main activity:
+
+```kotlin
+class MyApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        
+        val sdk = NeuralNodesInbox.getInstance("your-api-key")
+        lifecycleScope.launch {
+            sdk.initialize()
         }
     }
 }
 ```
 
-### Real-Time Updates
-
-Subscribe to live conversation updates:
+### 2. Handle Errors Gracefully
 
 ```kotlin
-import com.neuralnodes.inbox.network.RealtimeClient
-import kotlinx.coroutines.flow.collect
-
-val realtimeClient = RealtimeClient()
-realtimeClient.connect(config.ablyKey!!)
-
 lifecycleScope.launch {
-    realtimeClient.subscribeToConversation(conversationId).collect { message ->
-        println("New message: ${message.messageText}")
-        // Update your UI
+    try {
+        val conversations = apiClient.getConversations()
+    } catch (e: Exception) {
+        // Show user-friendly error message
+        showError("Unable to load conversations. Please try again.")
     }
 }
 ```
 
-## Permissions
+### 3. Cleanup on Logout
 
-The SDK automatically adds these permissions to your `AndroidManifest.xml`:
-
-```xml
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+```kotlin
+fun logout() {
+    sdk.disconnect()
+    // Clear user data
+}
 ```
 
-No additional configuration needed!
+### 4. Use Real-time Subscriptions Wisely
 
-## ProGuard / R8
+```kotlin
+override fun onResume() {
+    super.onResume()
+    // Subscribe when view is visible
+    lifecycleScope.launch {
+        realtimeClient.subscribeToConversation(conversationId).collect { message ->
+            // Handle message
+        }
+    }
+}
 
-The SDK includes its own ProGuard rules. No additional configuration required.
-
-If you encounter issues, add these rules to your `proguard-rules.pro`:
-
-```proguard
--keep class com.neuralnodes.inbox.** { *; }
--keep class io.ably.** { *; }
+override fun onPause() {
+    super.onPause()
+    // Unsubscribe when view is hidden
+    realtimeClient.unsubscribe(conversationId)
+}
 ```
+
+---
 
 ## Troubleshooting
 
@@ -340,6 +815,17 @@ If you encounter issues, add these rules to your `proguard-rules.pro`:
 - Check Logcat for error messages: `adb logcat | grep NeuralNodes`
 - Ensure `INTERNET` permission is granted
 
+### Build Errors
+
+**Problem:** Gradle sync fails or build errors
+
+**Solutions:**
+- Ensure GitHub Packages repository is added correctly
+- Check minimum SDK version is 24+
+- Verify your GitHub token has `read:packages` scope
+- Clean and rebuild: `./gradlew clean build`
+- Invalidate caches: File → Invalidate Caches / Restart
+
 ### Push Notifications Not Working
 
 **Problem:** Not receiving push notifications
@@ -351,82 +837,22 @@ If you encounter issues, add these rules to your `proguard-rules.pro`:
 - Check notification permissions are granted
 - Test with Firebase Console test message
 
-### Real-Time Updates Not Working
-
-**Problem:** Messages don't appear instantly
-
-**Solutions:**
-- Check Ably key is valid in SDK config
-- Verify internet connection is stable
-- Check Logcat for Ably connection errors
-- Ensure app is not in battery optimization mode
-
-### Build Errors
-
-**Problem:** Gradle sync fails or build errors
-
-**Solutions:**
-- Ensure JitPack repository is added
-- Check minimum SDK version is 24+
-- Clean and rebuild: `./gradlew clean build`
-- Invalidate caches: File → Invalidate Caches / Restart
-
-## Documentation
-
-- **Dashboard**: https://client.neuralnodes.space
-<!-- - **API Documentation**: https://docs.neuralnodes.space -->
-- **Support**: support@neuralnodes.space
+---
 
 ## Support
 
-For technical support and assistance:
-
-- **Email**: support@neuralnodes.space
-- **Issues**: [GitHub Issues](https://github.com/neuralnodes/neuralnodes-inbox-android/issues)
-<!-- - **Documentation**: https://docs.neuralnodes.space -->
-- **Live Chat**: Available in your dashboard
-
-## License
-
-This SDK is released under the MIT License. See [LICENSE](LICENSE) for details.
-
-```
-MIT License
-
-Copyright (c) 2024 NeuralNodes
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-```
-
-## Changelog
-
-### Version 1.0.0 (2024-04-23)
-
-**Initial Release**
-
-- Real-time messaging
-- Push notifications
-- Multi-channel support (Web, WhatsApp, Telegram, Email)
-- Material Design UI
-- Conversation management (read, resolve, filter)
-- File attachments support
-- Offline message queue
-- Customizable branding
-- Typing indicators
-- Read receipts
+- **Documentation:** [GitHub README](https://github.com/neuralnodes-sdk/neuralnodes-inbox-android)
+- **Email:** support@neuralnodes.com
+- **Issues:** [GitHub Issues](https://github.com/neuralnodes-sdk/neuralnodes-inbox-android/issues)
 
 ---
 
-**NeuralNodes**
+## License
 
-[Website](https://neuralnodes.space) • [Dashboard](https://client.neuralnodes.space)
+Copyright © 2024 NeuralNodes. All rights reserved.
 
- <!-- • [Documentation](https://docs.neuralnodes.space) -->
+This SDK is proprietary software. Unauthorized copying, distribution, or modification is prohibited.
+
+---
+
+**NeuralNodes** • [Website](https://neuralnodes.space) • [Dashboard](https://client.neuralnodes.space)
