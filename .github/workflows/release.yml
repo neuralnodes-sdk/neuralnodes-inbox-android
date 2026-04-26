@@ -128,11 +128,12 @@ jobs:
           echo "✅ Build completed successfully"
           echo "📦 Android SDK is ready for distribution"
       
-      - name: Publish to Maven Central
+      - name: Publish to Maven Central Staging
         if: steps.version_changed.outputs.changed == 'true' && steps.check_tag.outputs.exists == 'false'
         run: |
-          echo "📦 Publishing to Maven Central (Staging)..."
-          ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --no-daemon
+          echo "📦 Publishing to Maven Central Staging..."
+          echo "Using credentials: $OSSRH_USERNAME"
+          ./gradlew publishReleasePublicationToOSSRHRepository --no-daemon --stacktrace
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
